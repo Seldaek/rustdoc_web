@@ -1,0 +1,12 @@
+{% extends 'element.twig' %}
+
+{% block definition %}
+<pre>
+pub enum {{ element.name }} {
+{% for variant in element.variants %}
+    {{ variant.name }}, {% if variant.attrs.doc %}// {{ variant.attrs.doc }}{% endif %}
+
+{% endfor %}
+}
+</pre>
+{% endblock %}

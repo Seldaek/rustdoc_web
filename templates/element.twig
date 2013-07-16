@@ -1,0 +1,17 @@
+{% extends 'layout.twig' %}
+
+{% block content %}
+    {% block title %}
+        <h1>{{ element.name }} ({{ element.type }})</h1>
+    {% endblock %}
+
+    {% block short_description %}
+        {{ short_description }}
+    {% endblock %}
+
+    {% block definition %}{% endblock %}
+
+    {% block docs %}
+        {{ documentation }} {# TODO markdown render #}
+    {% endblock %}
+{% endblock %}

@@ -1,0 +1,335 @@
+{
+    "enums": [
+        {
+            "generics": {
+                "lifetimes": [],
+                "typarams": []
+            },
+            "variants": [
+                {
+                    "attrs": [
+                        {
+                            "doc": "///Fizz variant"
+                        }
+                    ],
+                    "id": "4",
+                    "name": "Fizz",
+                    "visibility": "inherited"
+                },
+                {
+                    "attrs": [
+                        {
+                            "doc": "///Buzz variant"
+                        }
+                    ],
+                    "id": "8",
+                    "name": "Buzz",
+                    "visibility": "inherited"
+                }
+            ],
+            "name": "FizzBuzz"
+        },
+        {
+            "generics": {
+                "lifetimes": [],
+                "typarams": [
+                    {
+                        "bounds": [],
+                        "name": "U"
+                    },
+                    {
+                        "bounds": [],
+                        "name": "V"
+                    }
+                ]
+            },
+            "variants": [
+                {
+                    "attrs": [
+                        {
+                            "doc": "/** This operation returned fine */"
+                        }
+                    ],
+                    "id": "15",
+                    "name": "FooBarOk",
+                    "visibility": "inherited"
+                },
+                {
+                    "attrs": [
+                        {
+                            "doc": "This operation failed miserably"
+                        }
+                    ],
+                    "id": "19",
+                    "name": "FooBarErr",
+                    "visibility": "inherited"
+                }
+            ],
+            "name": "FooBarState"
+        }
+    ],
+    "structs": [
+        {
+            "attrs": [
+                {
+                    "doc": "/// A Foo"
+                }
+            ],
+            "fields": [
+                {
+                    "attrs": [
+                        {
+                            "doc": "/// Is this Foo weak?"
+                        }
+                    ],
+                    "name": "feeble",
+                    "type": {
+                        "type": "bool"
+                    },
+                    "visibility": "inherit"
+                },
+                {
+                    "attrs": [
+                        {
+                            "doc": "/// How many bars this Foo owns"
+                        }
+                    ],
+                    "name": "bars",
+                    "type": {
+                        "type": "primitive",
+                        "value": "uint"
+                    },
+                    "visibility": "inherit"
+                },
+                {
+                    "attrs": [],
+                    "name": "undoc",
+                    "type": {
+                        "type": "resolved",
+                        "value": "50"
+                    },
+                    "visibility": "inherit"
+                }
+            ],
+            "generics": {
+                "lifetimes": [],
+                "typarams": []
+            },
+            "id": "33",
+            "name": "Foo",
+            "type": "Plain"
+        },
+        {
+            "attrs": [],
+            "fields": [
+                {
+                    "attrs": [],
+                    "name": "a",
+                    "type": {
+                        "type": "primitive",
+                        "value": "uint"
+                    },
+                    "visibility": "inherit"
+                },
+                {
+                    "attrs": [],
+                    "name": "b",
+                    "type": {
+                        "type": "primitive",
+                        "value": "int"
+                    },
+                    "visibility": "inherit"
+                },
+                {
+                    "attrs": [],
+                    "name": "c",
+                    "type": {
+                        "type": "tuple",
+                        "value": [
+                            {
+                                "type": "primitive",
+                                "value": "int"
+                            },
+                            {
+                                "type": "primitive",
+                                "value": "uint"
+                            },
+                            {
+                                "type": "resolved",
+                                "value": "56"
+                            }
+                        ]
+                    },
+                    "visibility": "inherit"
+                }
+            ],
+            "generics": {
+                "lifetimes": [],
+                "typarams": []
+            },
+            "id": "50",
+            "name": "Bar",
+            "type": "Plain"
+        },
+        {
+            "attrs": [
+                {
+                    "doc": "foo"
+                }
+            ],
+            "fields": [
+                {
+                    "attrs": [
+                        {
+                            "doc": "/// a field"
+                        }
+                    ],
+                    "name": "a",
+                    "type": {
+                        "type": "primitive",
+                        "value": "uint"
+                    },
+                    "visibility": "inherit"
+                }
+            ],
+            "generics": {
+                "lifetimes": [],
+                "typarams": []
+            },
+            "id": "56",
+            "name": "Baz",
+            "type": "Plain"
+        },
+        {
+            "attrs": [],
+            "fields": [],
+            "generics": {
+                "lifetimes": [],
+                "typarams": []
+            },
+            "id": "59",
+            "name": "Qux",
+            "type": "Unit"
+        },
+        {
+            "attrs": [],
+            "fields": [
+                {
+                    "attrs": [
+                        {
+                            "doc": "/** doc */"
+                        }
+                    ],
+                    "name": "",
+                    "type": {
+                        "type": "primitive",
+                        "value": "int"
+                    },
+                    "visibility": ""
+                },
+                {
+                    "attrs": [],
+                    "name": "",
+                    "type": {
+                        "type": "primitive",
+                        "value": "uint"
+                    },
+                    "visibility": ""
+                },
+                {
+                    "attrs": [],
+                    "name": "",
+                    "type": {
+                        "type": "resolved",
+                        "value": "56"
+                    },
+                    "visibility": ""
+                }
+            ],
+            "generics": {
+                "lifetimes": [],
+                "typarams": []
+            },
+            "id": "71",
+            "name": "Quux",
+            "type": "Tuple"
+        },
+        {
+            "attrs": [
+                {
+                    "doc": "///A Blam. T is a thing."
+                }
+            ],
+            "fields": [
+                {
+                    "attrs": [
+                        {
+                            "doc": "///Blam!!"
+                        }
+                    ],
+                    "name": "blam",
+                    "type": {
+                        "type": "resolved",
+                        "value": "73"
+                    },
+                    "visibility": "inherit"
+                }
+            ],
+            "generics": {
+                "lifetimes": [
+                    "self"
+                ],
+                "typarams": [
+                    {
+                        "bounds": [],
+                        "name": "T"
+                    }
+                ]
+            },
+            "id": "79",
+            "name": "Blam",
+            "type": "Plain"
+        },
+        {
+            "attrs": [
+                {
+                    "doc": "///A bar."
+                }
+            ],
+            "fields": [
+                {
+                    "attrs": [
+                        {
+                            "doc": "///How bazzy is this bar?"
+                        }
+                    ],
+                    "name": "baz",
+                    "type": {
+                        "type": "primitive",
+                        "value": "int"
+                    },
+                    "visibility": "inherit"
+                },
+                {
+                    "attrs": [
+                        {
+                            "doc": "///Is it a fizz? Or a buzz?"
+                        }
+                    ],
+                    "name": "fizzbuzz",
+                    "type": {
+                        "type": "bool"
+                    },
+                    "visibility": "inherit"
+                }
+            ],
+            "generics": {
+                "lifetimes": [],
+                "typarams": []
+            },
+            "id": "90",
+            "name": "Bar",
+            "type": "Plain"
+        }
+    ]
+}

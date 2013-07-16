@@ -1,0 +1,21 @@
+{% extends 'element.twig' %}
+
+{% block definition %}
+
+{% if element.type == 'Plain' %}
+<pre>
+struct {{ element.name }} {
+{% for field in element.fields %}
+    {{ field.name }} {{ field.type.value }};
+{% endfor %}
+}
+</pre>
+{% elseif element.type == 'Tuple' %}
+    <pre>struct {{ element.name }}({% for field in element.fields %}{{ field.type.value }}{% if not loop.last %}, {% endif %}{% endfor %})</pre>
+{% elseif element.type == 'Unit' %}
+    <pre>struct {{ element.name }};</pre>
+{% else %}
+    <pre>Unkwown struct type: {{ element.type }}</pre>
+{% endif %}
+
+{% endblock %}
