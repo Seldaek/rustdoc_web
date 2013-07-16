@@ -3,11 +3,19 @@
     <title>Rust Docs</title> {# TODO #}
 
     <link rel="stylesheet" type="text/css" href="{{ root_path }}main.css">
+
+    {# TODO #}
+    <link rel="canonical" href="{{ path_to_current_version_page }}" />
 </head>
 <body>
 
 <div class="sidebar">
-
+    <div class="block {{ type }}">
+        {{ type }}<br />
+        {% for name in type_tree[type] %}
+            <a{% if name == element.name %} class="current"{% endif %} href="{{ name }}.html">{{ name }}</a>
+        {% endfor %}
+    </div>
 </div>
 
 <div>

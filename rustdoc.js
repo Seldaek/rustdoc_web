@@ -92,7 +92,7 @@ function dumpModule(path, module, typeTree, references) {
     rootPath = '../' + (matches ? new Array(matches.length + 1).join('../') : '');
 
     types.forEach(function (type) {
-        if (type === 'modules' || !module[type]) {
+        if (!module[type]) {
             return;
         }
         module[type].forEach(function (def) {
@@ -100,6 +100,7 @@ function dumpModule(path, module, typeTree, references) {
             data = {
                 path: path,
                 type_tree: typeTree,
+                type: type,
                 root_path: rootPath,
                 element: def,
             };
