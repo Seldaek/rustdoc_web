@@ -6,7 +6,7 @@
 <pre>
 struct {{ element.name }} {
 {% for field in element.fields %}
-    {{ field.name }} {{ short_type(field.type) }};
+    {{ field.name }}: {{ short_type(field.type) }};
 {% endfor %}
 }
 </pre>
