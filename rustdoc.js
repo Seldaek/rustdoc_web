@@ -22,13 +22,46 @@ if (!fs.existsSync(BUILD_TARGET)) {
     fs.mkdirSync(BUILD_TARGET);
 }
 
-function render(template, vars, cb) {
-    vars.settings = {views: "templates/"};
+function render(template, vars, references, cb) {
+    vars.settings = {
+        views: "templates/",
+        'twig options': { strict_variables: true }
+    };
+
+    // helpers
+    vars.short_description = function (docblock) {
+        docblock = docblock || '';
+        return docblock.substring(0, docblock.indexOf('\n')).replace(/\s+$/, '');
+    };
+    vars.long_description = function (docblock) {
+        docblock = docblock || '';
+        return docblock.substring(docblock.indexOf('\n')).replace(/^\s+/, '');
+    };
+    vars.short_type = function short_type(type) {
+        if (type.type === 'primitive') {
+            return type.value;
+        }
+        if (type.type === 'bool') {
+            return 'bool'; // TODO deprecated
+        }
+        if (type.type === 'resolved') {
+            if (!references[type.value]) {
+                throw new Error('Invalid ref id: ' + type.value);
+            }
+
+            return references[type.value].def.name;
+        }
+        if (type.type === 'tuple') {
+            return '(' + type.value.map(short_type).join(', ') + ')';
+        }
+
+        throw new Error('Unknown type: ' + type.type + ', could not parse');
+    };
 
     Twig.renderFile("templates/" + template, vars, function (dummy, out) { cb(out); });
 }
 
-function indexModule(module, typeTree, path) {
+function indexModule(path, module, typeTree, references) {
     var types = ['modules', 'structs', 'enums', 'traits', 'typedefs', 'functions', 'reexports'];
 
     types.forEach(function (type) {
@@ -39,15 +72,18 @@ function indexModule(module, typeTree, path) {
             var name = def.name;
             if (type === 'modules') {
                 typeTree.modulesData[name] = createTypeTreeNode(typeTree);
-                indexModule(module.modules[name], typeTree.modulesData[name], path + '::' + name);
+                indexModule(path + '::' + name, module.modules[name], typeTree.modulesData[name], references);
             }
             // TODO remove the name fallback, everything should probably have one
             typeTree[type][def.id === undefined ? name : def.id] = name;
+            if (def.id !== undefined) {
+                references[def.id] = {type: type, def: def};
+            }
         });
     });
 }
 
-function dumpModule(module, typeTree, path) {
+function dumpModule(path, module, typeTree, references) {
     var rootPath, matches,
         buildPath = BUILD_TARGET + "/" + path.replace(/::/g, '/') + '/',
         types = ['structs', 'enums', 'traits', 'typedefs', 'functions', 'reexports'];
@@ -73,13 +109,13 @@ function dumpModule(module, typeTree, path) {
                 }
                 fs.writeFile(buildPath + def.name + ".html", out);
             };
-            render(type + '.twig', data, cb);
+            render(type + '.twig', data, references, cb);
         });
     });
 
     if (module.modules) {
         module.modules.forEach(function (mod) {
-            dumpModule(module.modules[mod.name], typeTree.modulesData[mod.name], path + '::' + mod.name);
+            dumpModule(path + '::' + mod.name, module.modules[mod.name], typeTree.modulesData[mod.name], references);
         });
     }
 }
@@ -102,6 +138,7 @@ function createTypeTreeNode(parent) {
 
 var data = JSON.parse(fs.readFileSync("input.json"));
 var typeTree = createTypeTreeNode();
+var references = createTypeTreeNode();
 
-indexModule(data, typeTree, crateName);
-dumpModule(data, typeTree, crateName);
+indexModule(crateName, data, typeTree, references);
+dumpModule(crateName, data, typeTree, references);

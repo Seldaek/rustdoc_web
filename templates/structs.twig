@@ -6,12 +6,12 @@
 <pre>
 struct {{ element.name }} {
 {% for field in element.fields %}
-    {{ field.name }} {{ field.type.value }};
+    {{ field.name }} {{ short_type(field.type) }};
 {% endfor %}
 }
 </pre>
 {% elseif element.type == 'Tuple' %}
-    <pre>struct {{ element.name }}({% for field in element.fields %}{{ field.type.value }}{% if not loop.last %}, {% endif %}{% endfor %})</pre>
+    <pre>struct {{ element.name }}({% for field in element.fields %}{{ short_type(field.type) }}{% if not loop.last %}, {% endif %}{% endfor %})</pre>
 {% elseif element.type == 'Unit' %}
     <pre>struct {{ element.name }};</pre>
 {% else %}

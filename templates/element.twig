@@ -6,12 +6,12 @@
     {% endblock %}
 
     {% block short_description %}
-        {{ short_description }}
+        {{ short_description(element.attrs.doc) }}
     {% endblock %}
 
     {% block definition %}{% endblock %}
 
     {% block docs %}
-        {{ documentation }} {# TODO markdown render #}
+        {{ long_description(element.attrs.doc) }} {# TODO markdown render #}
     {% endblock %}
 {% endblock %}

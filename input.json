@@ -1,6 +1,7 @@
 {
     "enums": [
         {
+            "attrs": {},
             "generics": {
                 "lifetimes": [],
                 "typarams": []
@@ -30,6 +31,7 @@
             "name": "FizzBuzz"
         },
         {
+            "attrs": {},
             "generics": {
                 "lifetimes": [],
                 "typarams": [
@@ -168,7 +170,7 @@
                 "typarams": []
             },
             "id": "50",
-            "name": "Bar",
+            "name": "Barz",
             "type": "Plain"
         },
         {
@@ -270,7 +272,7 @@
                     "name": "blam",
                     "type": {
                         "type": "resolved",
-                        "value": "73"
+                        "value": "90"
                     },
                     "visibility": "inherit"
                 }
