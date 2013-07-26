@@ -13,10 +13,36 @@
 var Twig = require("twig"),
     fs = require("fs");
 
-// params
-var crateName = 'std';
+var transTexts = {
+    'mods': 'Modules',
+    'structs': 'Structs',
+    'enums': 'Enums',
+    'traits': 'Traits',
+    'typedefs': 'Type Definitions',
+    'fns': 'Functions',
+    'reexports': 'Re-exports',
+    'mod': 'Module',
+    'struct': 'Struct',
+    'enum': 'Enum',
+    'trait': 'Trait',
+    'typedef': 'Type Definition',
+    'fn': 'Function',
+    'reexport': 'Re-export',
+};
 
-var BUILD_TARGET = 'build';
+Twig.extendFilter('trans', function (str) {
+    if (transTexts[str] !== undefined) {
+        return transTexts[str];
+    }
+
+    return str;
+});
+
+// params
+// TODO support building more than one crate at once
+var inputFile = "input.json";
+
+var BUILD_TARGET = "build";
 
 if (!fs.existsSync(BUILD_TARGET)) {
     fs.mkdirSync(BUILD_TARGET);
@@ -41,12 +67,10 @@ function render(template, vars, references, cb) {
         if (type.type === 'primitive') {
             return type.value;
         }
-        if (type.type === 'bool') {
-            return 'bool'; // TODO deprecated
-        }
         if (type.type === 'resolved') {
             if (!references[type.value]) {
-                throw new Error('Invalid ref id: ' + type.value);
+                return '<ID:'+type.value+'>'; // TODO fix this
+                throw new Error('Invalid resolved ref id: ' + type.value);
             }
 
             return references[type.value].def.name;
@@ -54,15 +78,27 @@ function render(template, vars, references, cb) {
         if (type.type === 'tuple') {
             return '(' + type.value.map(short_type).join(', ') + ')';
         }
+        if (type.type === 'managed') {
+            return '@' + short_type(type.value);
+        }
+        if (type.type === 'unique') {
+            return '~' + short_type(type.value);
+        }
+        if (type.type === 'vector') {
+            return '[' + short_type(type.value) + ']';
+        }
+        if (type.type === 'string') {
+            return 'str';
+        }
 
-        throw new Error('Unknown type: ' + type.type + ', could not parse');
+        throw new Error('Unknown type: ' + type.type + ' with value ' + JSON.stringify(type.value) + ', could not parse');
     };
 
     Twig.renderFile("templates/" + template, vars, function (dummy, out) { cb(out); });
 }
 
 function indexModule(path, module, typeTree, references) {
-    var types = ['modules', 'structs', 'enums', 'traits', 'typedefs', 'functions', 'reexports'];
+    var types = ['mods', 'structs', 'enums', 'traits', 'typedefs', 'fns', 'reexports'];
 
     types.forEach(function (type) {
         if (!module[type]) {
@@ -70,9 +106,9 @@ function indexModule(path, module, typeTree, references) {
         }
         module[type].forEach(function (def) {
             var name = def.name;
-            if (type === 'modules') {
-                typeTree.modulesData[name] = createTypeTreeNode(typeTree);
-                indexModule(path + '::' + name, module.modules[name], typeTree.modulesData[name], references);
+            if (type === 'mods') {
+                typeTree.modsData[name] = createTypeTreeNode(typeTree);
+                indexModule(path + '::' + name, def, typeTree.modsData[name], references);
             }
             // TODO remove the name fallback, everything should probably have one
             typeTree[type][def.id === undefined ? name : def.id] = name;
@@ -86,7 +122,7 @@ function indexModule(path, module, typeTree, references) {
 function dumpModule(path, module, typeTree, references) {
     var rootPath, matches,
         buildPath = BUILD_TARGET + "/" + path.replace(/::/g, '/') + '/',
-        types = ['structs', 'enums', 'traits', 'typedefs', 'functions', 'reexports'];
+        types = ['structs', 'enums', 'traits', 'typedefs', 'fns', 'reexports'];
 
     matches = path.match(/::/g);
     rootPath = '../' + (matches ? new Array(matches.length + 1).join('../') : '');
@@ -100,7 +136,7 @@ function dumpModule(path, module, typeTree, references) {
             data = {
                 path: path,
                 type_tree: typeTree,
-                type: type,
+                type: type.substring(0, type.length - 1),
                 root_path: rootPath,
                 element: def,
             };
@@ -108,15 +144,15 @@ function dumpModule(path, module, typeTree, references) {
                 if (!fs.existsSync(buildPath)) {
                     fs.mkdirSync(buildPath);
                 }
-                fs.writeFile(buildPath + def.name + ".html", out);
+                fs.writeFile(buildPath + type.substring(0, type.length - 1) + '.' + def.name  + ".html", out);
             };
             render(type + '.twig', data, references, cb);
         });
     });
 
-    if (module.modules) {
-        module.modules.forEach(function (mod) {
-            dumpModule(path + '::' + mod.name, module.modules[mod.name], typeTree.modulesData[mod.name], references);
+    if (module.mods) {
+        module.mods.forEach(function (mod) {
+            dumpModule(path + '::' + mod.name, mod, typeTree.modsData[mod.name], references);
         });
     }
 }
@@ -125,21 +161,26 @@ function createTypeTreeNode(parent) {
     parent = parent || null;
 
     return {
-        modules: {},
-        modulesData: {},
+        mods: {},
+        modsData: {},
         structs: {},
         enums: {},
         traits: {},
         typedefs: {},
-        functions: {},
+        fns: {},
         reexports: {},
         parent: parent,
     };
 }
 
-var data = JSON.parse(fs.readFileSync("input.json"));
+var data = JSON.parse(fs.readFileSync(inputFile));
+if (data.schema !== '0.2.0') {
+    throw new Error('Unsupported schema ' + data.schema);
+}
+
+var crateName = data.name;
 var typeTree = createTypeTreeNode();
 var references = createTypeTreeNode();
 
-indexModule(crateName, data, typeTree, references);
-dumpModule(crateName, data, typeTree, references);
+indexModule(crateName, data.mods[0], typeTree, references);
+dumpModule(crateName, data.mods[0], typeTree, references);

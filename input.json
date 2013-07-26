@@ -1,337 +1,3027 @@
 {
-    "enums": [
+    "attrs": [
         {
-            "attrs": {},
-            "generics": {
-                "lifetimes": [],
-                "typarams": []
-            },
-            "variants": [
+            "link": [
                 {
-                    "attrs": [
-                        {
-                            "doc": "///Fizz variant"
-                        }
-                    ],
-                    "id": "4",
-                    "name": "Fizz",
-                    "visibility": "inherited"
+                    "name": "rustdoc_ng"
                 },
                 {
-                    "attrs": [
-                        {
-                            "doc": "///Buzz variant"
-                        }
-                    ],
-                    "id": "8",
-                    "name": "Buzz",
-                    "visibility": "inherited"
+                    "vers": "0.1.0"
+                },
+                {
+                    "uuid": "8c6e4598-1596-4aa5-a24c-b811914bbbc6"
                 }
-            ],
-            "name": "FizzBuzz"
+            ]
         },
         {
-            "attrs": {},
-            "generics": {
-                "lifetimes": [],
-                "typarams": [
-                    {
-                        "bounds": [],
-                        "name": "U"
-                    },
-                    {
-                        "bounds": [],
-                        "name": "V"
-                    }
-                ]
-            },
-            "variants": [
-                {
-                    "attrs": [
-                        {
-                            "doc": "/** This operation returned fine */"
-                        }
-                    ],
-                    "id": "15",
-                    "name": "FooBarOk",
-                    "visibility": "inherited"
-                },
-                {
-                    "attrs": [
-                        {
-                            "doc": "This operation failed miserably"
-                        }
-                    ],
-                    "id": "19",
-                    "name": "FooBarErr",
-                    "visibility": "inherited"
-                }
-            ],
-            "name": "FooBarState"
+            "desc": "rustdoc, the Rust documentation extractor"
+        },
+        {
+            "license": "MIT/ASL2"
+        },
+        {
+            "crate_type": "bin"
         }
     ],
-    "structs": [
-        {
-            "attrs": [
-                {
-                    "doc": "/// A Foo"
-                }
-            ],
-            "fields": [
-                {
-                    "attrs": [
-                        {
-                            "doc": "/// Is this Foo weak?"
-                        }
-                    ],
-                    "name": "feeble",
-                    "type": {
-                        "type": "bool"
-                    },
-                    "visibility": "inherit"
-                },
-                {
-                    "attrs": [
-                        {
-                            "doc": "/// How many bars this Foo owns"
-                        }
-                    ],
-                    "name": "bars",
-                    "type": {
-                        "type": "primitive",
-                        "value": "uint"
-                    },
-                    "visibility": "inherit"
-                },
-                {
-                    "attrs": [],
-                    "name": "undoc",
-                    "type": {
-                        "type": "resolved",
-                        "value": "50"
-                    },
-                    "visibility": "inherit"
-                }
-            ],
-            "generics": {
-                "lifetimes": [],
-                "typarams": []
-            },
-            "id": "33",
-            "name": "Foo",
-            "type": "Plain"
-        },
+    "mods": [
         {
             "attrs": [],
-            "fields": [
+            "enums": [],
+            "fns": [
                 {
-                    "attrs": [],
-                    "name": "a",
-                    "type": {
-                        "type": "primitive",
-                        "value": "uint"
-                    },
-                    "visibility": "inherit"
-                },
-                {
-                    "attrs": [],
-                    "name": "b",
-                    "type": {
-                        "type": "primitive",
-                        "value": "int"
-                    },
-                    "visibility": "inherit"
-                },
-                {
-                    "attrs": [],
-                    "name": "c",
-                    "type": {
-                        "type": "tuple",
-                        "value": [
+                    "attrs": [
+                        {
+                            "doc": "Parses, resolves, and typechecks the given crate"
+                        }
+                    ],
+                    "decl": {
+                        "arguments": [
                             {
-                                "type": "primitive",
-                                "value": "int"
+                                "id": 4131,
+                                "mutable": false,
+                                "type": {
+                                    "type": "resolved",
+                                    "value": 101797
+                                }
                             },
                             {
-                                "type": "primitive",
-                                "value": "uint"
-                            },
-                            {
-                                "type": "resolved",
-                                "value": "56"
+                                "id": 4137,
+                                "mutable": false,
+                                "type": {
+                                    "type": "unique",
+                                    "value": {
+                                        "type": "vector",
+                                        "value": {
+                                            "type": "resolved",
+                                            "value": 101797
+                                        }
+                                    }
+                                }
                             }
-                        ]
+                        ],
+                        "output": {
+                            "type": "resolved",
+                            "value": 4126
+                        },
+                        "return_style": "return"
                     },
-                    "visibility": "inherit"
-                }
-            ],
-            "generics": {
-                "lifetimes": [],
-                "typarams": []
-            },
-            "id": "50",
-            "name": "Barz",
-            "type": "Plain"
-        },
-        {
-            "attrs": [
-                {
-                    "doc": "foo"
-                }
-            ],
-            "fields": [
+                    "generics": {
+                        "lifetimes": [],
+                        "typarams": []
+                    },
+                    "id": 4234,
+                    "name": "get_ast_and_resolve",
+                    "source": "main.rs:44:0: 67:1"
+                },
                 {
                     "attrs": [
                         {
-                            "doc": "/// a field"
+                            "doc": ""
                         }
                     ],
-                    "name": "a",
-                    "type": {
-                        "type": "primitive",
-                        "value": "uint"
+                    "decl": {
+                        "arguments": [],
+                        "output": {
+                            "type": "unit"
+                        },
+                        "return_style": "return"
                     },
-                    "visibility": "inherit"
+                    "generics": {
+                        "lifetimes": [],
+                        "typarams": []
+                    },
+                    "id": 4359,
+                    "name": "main",
+                    "source": "main.rs:69:0: 92:1"
                 }
             ],
-            "generics": {
-                "lifetimes": [],
-                "typarams": []
-            },
-            "id": "56",
-            "name": "Baz",
-            "type": "Plain"
-        },
-        {
-            "attrs": [],
-            "fields": [],
-            "generics": {
-                "lifetimes": [],
-                "typarams": []
-            },
-            "id": "59",
-            "name": "Qux",
-            "type": "Unit"
-        },
-        {
-            "attrs": [],
-            "fields": [
+            "mods": [
                 {
-                    "attrs": [
+                    "attrs": [],
+                    "enums": [],
+                    "fns": [],
+                    "mods": [
                         {
-                            "doc": "/** doc */"
+                            "attrs": [],
+                            "enums": [],
+                            "fns": [],
+                            "mods": [],
+                            "name": "debug_macro",
+                            "structs": []
                         }
                     ],
-                    "name": "",
-                    "type": {
-                        "type": "primitive",
-                        "value": "int"
-                    },
-                    "visibility": ""
+                    "name": "__std_macros",
+                    "structs": []
                 },
                 {
                     "attrs": [],
-                    "name": "",
-                    "type": {
-                        "type": "primitive",
-                        "value": "uint"
-                    },
-                    "visibility": ""
+                    "enums": [
+                        {
+                            "attrs": [
+                                {
+                                    "deriving": [
+                                        "ToStr"
+                                    ]
+                                },
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 87,
+                            "name": "StructType",
+                            "source": "doctree.rs:30:0: 39:1",
+                            "variants": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": "A normal struct"
+                                        }
+                                    ],
+                                    "kind": {
+                                        "type": "c-like"
+                                    },
+                                    "name": "Plain",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": "A tuple struct"
+                                        }
+                                    ],
+                                    "kind": {
+                                        "type": "c-like"
+                                    },
+                                    "name": "Tuple",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": "A newtype struct (tuple struct with one element)"
+                                        }
+                                    ],
+                                    "kind": {
+                                        "type": "c-like"
+                                    },
+                                    "name": "Newtype",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": "A unit struct"
+                                        }
+                                    ],
+                                    "kind": {
+                                        "type": "c-like"
+                                    },
+                                    "name": "Unit",
+                                    "visibility": "inherited"
+                                }
+                            ]
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 93,
+                            "name": "TypeBound",
+                            "source": "doctree.rs:41:0: 44:1",
+                            "variants": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "type": "c-like"
+                                    },
+                                    "name": "RegionBound",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "members": [
+                                            {
+                                                "type": "resolved",
+                                                "value": 9775
+                                            }
+                                        ],
+                                        "type": "tuple"
+                                    },
+                                    "name": "TraitBound",
+                                    "visibility": "inherited"
+                                }
+                            ]
+                        }
+                    ],
+                    "fns": [
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "decl": {
+                                "arguments": [
+                                    {
+                                        "id": 270,
+                                        "mutable": false,
+                                        "type": {
+                                            "type": "resolved",
+                                            "value": 9851
+                                        }
+                                    }
+                                ],
+                                "output": {
+                                    "type": "resolved",
+                                    "value": 87
+                                },
+                                "return_style": "return"
+                            },
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 302,
+                            "name": "struct_type_from_def",
+                            "source": "doctree.rs:107:0: 118:1"
+                        }
+                    ],
+                    "mods": [],
+                    "name": "doctree",
+                    "structs": [
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "name",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 60051
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "attrs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 9750
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "structs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 197
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "enums",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 222
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "fns",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 265
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "mods",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 55
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 55,
+                            "name": "Module",
+                            "source": "doctree.rs:7:0: 14:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "id",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 7822
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "type_",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 9231
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": "Name is optional for tuple structs"
+                                        }
+                                    ],
+                                    "name": "name",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 60051
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "attrs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 9750
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "visibility",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 60051
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 117,
+                            "name": "StructField",
+                            "source": "doctree.rs:46:0: 53:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "id",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 7822
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "struct_type",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 87
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "name",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 7645
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "generics",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 7872
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "attrs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 9750
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "fields",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 117
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "where",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 4920
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 197,
+                            "name": "Struct",
+                            "source": "doctree.rs:71:0: 79:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "variants",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 239
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "generics",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 7872
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "attrs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 9750
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "id",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 7822
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "where",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 4920
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "name",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 7645
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 222,
+                            "name": "Enum",
+                            "source": "doctree.rs:81:0: 88:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "name",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 7645
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "attrs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 9750
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "kind",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 9619
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "visibility",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 9779
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 239,
+                            "name": "Variant",
+                            "source": "doctree.rs:90:0: 95:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "decl",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 9466
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "attrs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 9750
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "id",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 7822
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "name",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 7645
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "visibility",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 9779
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "where",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 4920
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "generics",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 7872
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 265,
+                            "name": "Function",
+                            "source": "doctree.rs:97:0: 105:1",
+                            "type": "Plain"
+                        }
+                    ]
                 },
                 {
                     "attrs": [],
-                    "name": "",
-                    "type": {
-                        "type": "resolved",
-                        "value": "56"
-                    },
-                    "visibility": ""
-                }
-            ],
-            "generics": {
-                "lifetimes": [],
-                "typarams": []
-            },
-            "id": "71",
-            "name": "Quux",
-            "type": "Tuple"
-        },
-        {
-            "attrs": [
-                {
-                    "doc": "///A Blam. T is a thing."
-                }
-            ],
-            "fields": [
-                {
-                    "attrs": [
+                    "enums": [
                         {
-                            "doc": "///Blam!!"
+                            "attrs": [
+                                {
+                                    "deriving": [
+                                        "Clone"
+                                    ]
+                                },
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 524,
+                            "name": "Attribute",
+                            "source": "clean.rs:66:0: 70:1",
+                            "variants": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "members": [
+                                            {
+                                                "type": "unique",
+                                                "value": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        ],
+                                        "type": "tuple"
+                                    },
+                                    "name": "Word",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "members": [
+                                            {
+                                                "type": "unique",
+                                                "value": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            {
+                                                "type": "unique",
+                                                "value": {
+                                                    "type": "vector",
+                                                    "value": {
+                                                        "type": "resolved",
+                                                        "value": 524
+                                                    }
+                                                }
+                                            }
+                                        ],
+                                        "type": "tuple"
+                                    },
+                                    "name": "List",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "members": [
+                                            {
+                                                "type": "unique",
+                                                "value": {
+                                                    "type": "string"
+                                                }
+                                            },
+                                            {
+                                                "type": "unique",
+                                                "value": {
+                                                    "type": "string"
+                                                }
+                                            }
+                                        ],
+                                        "type": "tuple"
+                                    },
+                                    "name": "NameValue",
+                                    "visibility": "inherited"
+                                }
+                            ]
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 671,
+                            "name": "TyParamBound",
+                            "source": "clean.rs:106:0: 109:1",
+                            "variants": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "type": "c-like"
+                                    },
+                                    "name": "RegionBound",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "members": [
+                                            {
+                                                "type": "resolved",
+                                                "value": 1069
+                                            }
+                                        ],
+                                        "type": "tuple"
+                                    },
+                                    "name": "TraitBound",
+                                    "visibility": "inherited"
+                                }
+                            ]
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 850,
+                            "name": "TraitMethod",
+                            "source": "clean.rs:169:0: 172:1",
+                            "variants": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "members": [
+                                            {
+                                                "type": "resolved",
+                                                "value": 841
+                                            }
+                                        ],
+                                        "type": "tuple"
+                                    },
+                                    "name": "Required",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "members": [
+                                            {
+                                                "type": "resolved",
+                                                "value": 823
+                                            }
+                                        ],
+                                        "type": "tuple"
+                                    },
+                                    "name": "Provided",
+                                    "visibility": "inherited"
+                                }
+                            ]
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 1026,
+                            "name": "RetStyle",
+                            "source": "clean.rs:236:0: 239:1",
+                            "variants": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "type": "c-like"
+                                    },
+                                    "name": "NoReturn",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "type": "c-like"
+                                    },
+                                    "name": "Return",
+                                    "visibility": "inherited"
+                                }
+                            ]
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "deriving": [
+                                        "Clone"
+                                    ]
+                                },
+                                {
+                                    "doc": "A representation of a Type suitable for hyperlinking purposes. Ideally one can get the original type out of the AST/ty::ctxt given one of these, if more information is needed. Most importantly it does not preserve mutability or boxes."
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 1132,
+                            "name": "Type",
+                            "source": "clean.rs:272:0: 294:1",
+                            "variants": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": "Most types start out as \"Unresolved\". It serves as an intermediate stage between cleaning and type resolution."
+                                        }
+                                    ],
+                                    "kind": {
+                                        "members": [
+                                            {
+                                                "type": "resolved",
+                                                "value": 7822
+                                            }
+                                        ],
+                                        "type": "tuple"
+                                    },
+                                    "name": "Unresolved",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": "structs/enums/traits (anything that'd be an ast::ty_path)"
+                                        }
+                                    ],
+                                    "kind": {
+                                        "members": [
+                                            {
+                                                "type": "resolved",
+                                                "value": 7822
+                                            }
+                                        ],
+                                        "type": "tuple"
+                                    },
+                                    "name": "Resolved",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": "For parameterized types, so the consumer of the JSON don't go looking for types which don't exist anywhere."
+                                        }
+                                    ],
+                                    "kind": {
+                                        "members": [
+                                            {
+                                                "type": "resolved",
+                                                "value": 7822
+                                            }
+                                        ],
+                                        "type": "tuple"
+                                    },
+                                    "name": "Generic",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": "For references to self"
+                                        }
+                                    ],
+                                    "kind": {
+                                        "members": [
+                                            {
+                                                "type": "resolved",
+                                                "value": 7822
+                                            }
+                                        ],
+                                        "type": "tuple"
+                                    },
+                                    "name": "Self",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": "Primitives are just the fixed-size numeric types (plus int/uint/float), and char."
+                                        }
+                                    ],
+                                    "kind": {
+                                        "members": [
+                                            {
+                                                "type": "resolved",
+                                                "value": 9246
+                                            }
+                                        ],
+                                        "type": "tuple"
+                                    },
+                                    "name": "Primitive",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "members": [
+                                            {
+                                                "type": "unique",
+                                                "value": {
+                                                    "type": "vector",
+                                                    "value": {
+                                                        "type": "resolved",
+                                                        "value": 1132
+                                                    }
+                                                }
+                                            }
+                                        ],
+                                        "type": "tuple"
+                                    },
+                                    "name": "Tuple",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "members": [
+                                            {
+                                                "type": "unique",
+                                                "value": {
+                                                    "type": "resolved",
+                                                    "value": 1132
+                                                }
+                                            }
+                                        ],
+                                        "type": "tuple"
+                                    },
+                                    "name": "Vector",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "type": "c-like"
+                                    },
+                                    "name": "String",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "type": "c-like"
+                                    },
+                                    "name": "Bool",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": "aka ty_nil"
+                                        }
+                                    ],
+                                    "kind": {
+                                        "type": "c-like"
+                                    },
+                                    "name": "Unit",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "members": [
+                                            {
+                                                "type": "unique",
+                                                "value": {
+                                                    "type": "resolved",
+                                                    "value": 1132
+                                                }
+                                            }
+                                        ],
+                                        "type": "tuple"
+                                    },
+                                    "name": "Unique",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "members": [
+                                            {
+                                                "type": "unique",
+                                                "value": {
+                                                    "type": "resolved",
+                                                    "value": 1132
+                                                }
+                                            }
+                                        ],
+                                        "type": "tuple"
+                                    },
+                                    "name": "Managed",
+                                    "visibility": "inherited"
+                                }
+                            ]
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 1674,
+                            "name": "VariantKind",
+                            "source": "clean.rs:418:0: 422:1",
+                            "variants": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "type": "c-like"
+                                    },
+                                    "name": "CLikeVariant",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "members": [
+                                            {
+                                                "type": "unique",
+                                                "value": {
+                                                    "type": "vector",
+                                                    "value": {
+                                                        "type": "resolved",
+                                                        "value": 1132
+                                                    }
+                                                }
+                                            }
+                                        ],
+                                        "type": "tuple"
+                                    },
+                                    "name": "TupleVariant",
+                                    "visibility": "inherited"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "kind": {
+                                        "members": [
+                                            {
+                                                "type": "resolved",
+                                                "value": 1466
+                                            }
+                                        ],
+                                        "type": "tuple"
+                                    },
+                                    "name": "StructVariant",
+                                    "visibility": "inherited"
+                                }
+                            ]
                         }
                     ],
-                    "name": "blam",
-                    "type": {
-                        "type": "resolved",
-                        "value": "90"
-                    },
-                    "visibility": "inherit"
-                }
-            ],
-            "generics": {
-                "lifetimes": [
-                    "self"
-                ],
-                "typarams": [
-                    {
-                        "bounds": [],
-                        "name": "T"
-                    }
-                ]
-            },
-            "id": "79",
-            "name": "Blam",
-            "type": "Plain"
-        },
-        {
-            "attrs": [
-                {
-                    "doc": "///A bar."
-                }
-            ],
-            "fields": [
-                {
-                    "attrs": [
+                    "fns": [
                         {
-                            "doc": "///How bazzy is this bar?"
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "decl": {
+                                "arguments": [
+                                    {
+                                        "id": 1783,
+                                        "mutable": false,
+                                        "type": {
+                                            "type": "resolved",
+                                            "value": 9046
+                                        }
+                                    }
+                                ],
+                                "output": {
+                                    "type": "unique",
+                                    "value": {
+                                        "type": "string"
+                                    }
+                                },
+                                "return_style": "return"
+                            },
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 1855,
+                            "name": "lit_to_str",
+                            "source": "clean.rs:449:0: 461:1"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "decl": {
+                                "arguments": [
+                                    {
+                                        "id": 1860,
+                                        "mutable": false,
+                                        "type": {
+                                            "type": "string"
+                                        }
+                                    }
+                                ],
+                                "output": {
+                                    "type": "unique",
+                                    "value": {
+                                        "type": "string"
+                                    }
+                                },
+                                "return_style": "return"
+                            },
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 1921,
+                            "name": "remove_comment_tags",
+                            "source": "clean.rs:463:0: 469:1"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "decl": {
+                                "arguments": [
+                                    {
+                                        "id": 1927,
+                                        "mutable": false,
+                                        "type": {
+                                            "type": "unique",
+                                            "value": {
+                                                "type": "vector",
+                                                "value": {
+                                                    "type": "resolved",
+                                                    "value": 524
+                                                }
+                                            }
+                                        }
+                                    }
+                                ],
+                                "output": {
+                                    "type": "unique",
+                                    "value": {
+                                        "type": "vector",
+                                        "value": {
+                                            "type": "resolved",
+                                            "value": 524
+                                        }
+                                    }
+                                },
+                                "return_style": "return"
+                            },
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 2036,
+                            "name": "collapse_docs",
+                            "source": "clean.rs:471:0: 486:1"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": "Given a Type, resolve it using the def_map"
+                                }
+                            ],
+                            "decl": {
+                                "arguments": [
+                                    {
+                                        "id": 2041,
+                                        "mutable": false,
+                                        "type": {
+                                            "type": "resolved",
+                                            "value": 1132
+                                        }
+                                    }
+                                ],
+                                "output": {
+                                    "type": "resolved",
+                                    "value": 1132
+                                },
+                                "return_style": "return"
+                            },
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 2198,
+                            "name": "resolve_type",
+                            "source": "clean.rs:489:0: 527:1"
                         }
                     ],
-                    "name": "baz",
-                    "type": {
-                        "type": "primitive",
-                        "value": "int"
-                    },
-                    "visibility": "inherit"
+                    "mods": [],
+                    "name": "clean",
+                    "structs": [
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "name",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "attrs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 524
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "mods",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 439
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 371,
+                            "name": "Crate",
+                            "source": "clean.rs:20:0: 24:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "name",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "attrs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 524
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "structs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 1386
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "enums",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 1531
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "fns",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 878
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "mods",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 439
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 439,
+                            "name": "Module",
+                            "source": "clean.rs:38:0: 45:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "name",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "node",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 7822
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "bounds",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 671
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 625,
+                            "name": "TyParam",
+                            "source": "clean.rs:90:0: 94:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "visibility": ""
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 705,
+                            "name": "Lifetime",
+                            "source": "clean.rs:120:0: 120:26",
+                            "type": "Newtype"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "lifetimes",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 705
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "type_params",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 625
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 740,
+                            "name": "Generics",
+                            "source": "clean.rs:129:0: 132:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "ident",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "attrs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 524
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "generics",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 740
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "id",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 7822
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "vis",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 1356
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 823,
+                            "name": "Method",
+                            "source": "clean.rs:152:0: 159:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "ident",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "attrs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 524
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "generics",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 740
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "id",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 7822
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 841,
+                            "name": "TyMethod",
+                            "source": "clean.rs:161:0: 167:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "decl",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 941
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "name",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "visibility",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 1356
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "where",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "generics",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 740
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "id",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 7822
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "attrs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 524
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 878,
+                            "name": "Function",
+                            "source": "clean.rs:174:0: 183:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "inputs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 998
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "output",
+                                    "type": {
+                                        "type": "managed",
+                                        "value": {
+                                            "type": "resolved",
+                                            "value": 1132
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "cf",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 1026
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "attrs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 524
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 941,
+                            "name": "FnDecl",
+                            "source": "clean.rs:200:0: 205:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "mutable",
+                                    "type": {
+                                        "type": "primitive",
+                                        "value": "bool"
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "ty",
+                                    "type": {
+                                        "type": "managed",
+                                        "value": {
+                                            "type": "resolved",
+                                            "value": 1132
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "id",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 7822
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 998,
+                            "name": "Argument",
+                            "source": "clean.rs:219:0: 224:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "name",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "methods",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 823
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "lifetimes",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 705
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "generics",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 740
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 1069,
+                            "name": "Trait",
+                            "source": "clean.rs:250:0: 255:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "name",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "type_",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 1132
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "attrs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 524
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "visibility",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 60051
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 1293,
+                            "name": "StructField",
+                            "source": "clean.rs:316:0: 321:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "name",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "where",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "node",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 7822
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "struct_type",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 87
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "attrs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 524
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "generics",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 740
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "fields",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 1293
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 1386,
+                            "name": "Struct",
+                            "source": "clean.rs:336:0: 344:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": "This is a more limited form of the standard Struct, different in that it it lacks the things most items have (name, id, parameterization). Found only as a variant in an enum."
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "struct_type",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 87
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "fields",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 1293
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 1466,
+                            "name": "VariantStruct",
+                            "source": "clean.rs:363:0: 366:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "variants",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 1616
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "generics",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 740
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "attrs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 524
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "name",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "node",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 7822
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "where",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 1531,
+                            "name": "Enum",
+                            "source": "clean.rs:378:0: 385:1",
+                            "type": "Plain"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "name",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "string"
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "attrs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 524
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "kind",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 1674
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "visibility",
+                                    "type": {
+                                        "type": "resolved",
+                                        "value": 1356
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 1616,
+                            "name": "Variant",
+                            "source": "clean.rs:400:0: 405:1",
+                            "type": "Plain"
+                        }
+                    ]
                 },
                 {
-                    "attrs": [
+                    "attrs": [],
+                    "enums": [],
+                    "fns": [],
+                    "mods": [],
+                    "name": "jsonify",
+                    "structs": []
+                },
+                {
+                    "attrs": [],
+                    "enums": [],
+                    "fns": [],
+                    "mods": [],
+                    "name": "visit",
+                    "structs": [
                         {
-                            "doc": "///Is it a fizz? Or a buzz?"
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "fields": [
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "mods",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 55
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                },
+                                {
+                                    "attrs": [
+                                        {
+                                            "doc": ""
+                                        }
+                                    ],
+                                    "name": "attrs",
+                                    "type": {
+                                        "type": "unique",
+                                        "value": {
+                                            "type": "vector",
+                                            "value": {
+                                                "type": "resolved",
+                                                "value": 9750
+                                            }
+                                        }
+                                    },
+                                    "visibility": "inherit"
+                                }
+                            ],
+                            "generics": {
+                                "lifetimes": [],
+                                "typarams": []
+                            },
+                            "id": 3599,
+                            "name": "RustdocVisitor",
+                            "source": "visit.rs:14:0: 17:1",
+                            "type": "Plain"
                         }
-                    ],
-                    "name": "fizzbuzz",
-                    "type": {
-                        "type": "bool"
-                    },
-                    "visibility": "inherit"
+                    ]
                 }
             ],
-            "generics": {
-                "lifetimes": [],
-                "typarams": []
-            },
-            "id": "90",
-            "name": "Bar",
-            "type": "Plain"
+            "name": "",
+            "structs": [
+                {
+                    "attrs": [
+                        {
+                            "doc": ""
+                        }
+                    ],
+                    "fields": [
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "name": "crate",
+                            "type": {
+                                "type": "managed",
+                                "value": {
+                                    "type": "resolved",
+                                    "value": 8079
+                                }
+                            },
+                            "visibility": "inherit"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "name": "tycx",
+                            "type": {
+                                "type": "resolved",
+                                "value": 84415
+                            },
+                            "visibility": "inherit"
+                        },
+                        {
+                            "attrs": [
+                                {
+                                    "doc": ""
+                                }
+                            ],
+                            "name": "sess",
+                            "type": {
+                                "type": "resolved",
+                                "value": 264651
+                            },
+                            "visibility": "inherit"
+                        }
+                    ],
+                    "generics": {
+                        "lifetimes": [],
+                        "typarams": []
+                    },
+                    "id": 4126,
+                    "name": "DocContext",
+                    "source": "main.rs:37:0: 41:1",
+                    "type": "Plain"
+                }
+            ]
         }
-    ]
+    ],
+    "name": "rustdoc_ng",
+    "schema": "0.2.0"
 }
