@@ -11,9 +11,9 @@
 
 <div class="sidebar">
     <div class="block {{ type }}">
-        {{ (type ~ 's')|trans }}<br />
-        {% for name in type_tree[type ~ 's'] %}
-            <a{% if name == element.name %} class="current"{% endif %} href="{{ type }}.{{ name }}.html">{{ name }}</a>
+        <h2>{{ (type ~ 's')|trans }}</h2>
+        {% for id, name in type_tree[type ~ 's'] %}
+            <a{% if name == element.name %} class="current"{% endif %} href="{{ url_to_element(id, type_tree) }}">{{ name }}</a><br />
         {% endfor %}
     </div>
 </div>

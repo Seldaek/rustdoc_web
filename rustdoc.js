@@ -48,11 +48,52 @@ if (!fs.existsSync(BUILD_TARGET)) {
     fs.mkdirSync(BUILD_TARGET);
 }
 
+function shortType(type) {
+    return type.substring(0, type.length - 1);
+}
+
 function render(template, vars, references, cb) {
     vars.settings = {
         views: "templates/",
         'twig options': { strict_variables: true }
     };
+
+    function getPath(tree) {
+        var bits = [];
+        bits.push(tree.name || '');
+        while (tree.parent) {
+            tree = tree.parent;
+            bits.push(tree.name);
+        }
+
+        bits.reverse();
+
+        return bits;
+    }
+
+    function relativePath(fromTree, toTree) {
+        var fromPath, toPath;
+
+        if (fromTree === toTree) {
+            return '';
+        }
+
+        fromPath = getPath(fromTree);
+        toPath = getPath(toTree);
+
+        while (toPath.length && fromPath.length && toPath[0] === fromPath[0]) {
+            toPath.shift();
+            fromPath.shift();
+        }
+
+        return (new Array(fromPath.length + 1).join('../') + toPath.join('/') + '/').replace(/\/+$/, '/');
+    }
+
+    function modPath(typeTree) {
+        var path = getPath(typeTree).join('::');
+
+        return path + (path ? '::' : '');
+    }
 
     // helpers
     vars.short_description = function (docblock) {
@@ -63,7 +104,41 @@ function render(template, vars, references, cb) {
         docblock = docblock || '';
         return docblock.substring(docblock.indexOf('\n')).replace(/^\s+/, '');
     };
-    vars.short_type = function short_type(type) {
+    vars.link_to_element = function (id, currentTree) {
+        if (references[id].tree === currentTree) {
+            return '<a href="' + vars.url_to_element(id, currentTree) + '">' + references[id].def.name + '</a>';
+        }
+
+        return '<a href="' + vars.url_to_element(id, currentTree) + '">' + modPath(references[id].tree) + references[id].def.name + '</a>';
+    };
+    vars.url_to_element = function (id, currentTree) {
+        if (references[id].type === 'mods') {
+            return relativePath(currentTree, references[id].tree) + references[id].def.name + '/index.html';
+        }
+        return relativePath(currentTree, references[id].tree) + shortType(references[id].type) + '.' + references[id].def.name + '.html';
+    };
+    vars.breadcrumb = function (typeTree, currentTree) {
+        var path = [], out = '', tmpTree;
+
+        currentTree = currentTree || typeTree;
+        path.push(typeTree);
+
+        tmpTree = typeTree;
+        while (tmpTree.parent) {
+            tmpTree = tmpTree.parent;
+            path.push(tmpTree);
+        }
+        path.reverse();
+
+        path.forEach(function (targetTree) {
+            out += '<a href="' + relativePath(currentTree, targetTree) + 'index.html">' + targetTree.name + '</a>::';
+        });
+
+        return out;
+    };
+    vars.short_type = function shortType(type, currentTree) {
+        var types;
+
         if (type.type === 'primitive') {
             return type.value;
         }
@@ -73,19 +148,23 @@ function render(template, vars, references, cb) {
                 throw new Error('Invalid resolved ref id: ' + type.value);
             }
 
-            return references[type.value].def.name;
+            return vars.link_to_element(type.value, currentTree);
         }
         if (type.type === 'tuple') {
-            return '(' + type.value.map(short_type).join(', ') + ')';
+            types = type.value.map(function (t) {
+                return shortType(t, currentTree);
+            }).join(', ');
+
+            return '(' + types + ')';
         }
         if (type.type === 'managed') {
-            return '@' + short_type(type.value);
+            return '@' + shortType(type.value, currentTree);
         }
         if (type.type === 'unique') {
-            return '~' + short_type(type.value);
+            return '~' + shortType(type.value, currentTree);
         }
         if (type.type === 'vector') {
-            return '[' + short_type(type.value) + ']';
+            return '[' + shortType(type.value, currentTree) + ']';
         }
         if (type.type === 'string') {
             return 'str';
@@ -107,14 +186,16 @@ function indexModule(path, module, typeTree, references) {
         module[type].forEach(function (def) {
             var name = def.name;
             if (type === 'mods') {
-                typeTree.modsData[name] = createTypeTreeNode(typeTree);
-                indexModule(path + '::' + name, def, typeTree.modsData[name], references);
+                def.id = path + name;
+                typeTree.submods[name] = createTypeTreeNode(name, typeTree);
+                indexModule(path + '::' + name, def, typeTree.submods[name], references);
+            } else {
+                if (def.id === undefined) {
+                    throw new Error('Missing id on ' + JSON.stringify(def));
+                }
             }
-            // TODO remove the name fallback, everything should probably have one
-            typeTree[type][def.id === undefined ? name : def.id] = name;
-            if (def.id !== undefined) {
-                references[def.id] = {type: type, def: def};
-            }
+            typeTree[type][def.id] = name;
+            references[def.id] = {type: type, def: def, tree: typeTree};
         });
     });
 }
@@ -127,49 +208,59 @@ function dumpModule(path, module, typeTree, references) {
     matches = path.match(/::/g);
     rootPath = '../' + (matches ? new Array(matches.length + 1).join('../') : '');
 
+    function renderTemplate(type, def, filename) {
+        var data, cb;
+        data = {
+            path: path,
+            type_tree: typeTree,
+            type: shortType(type),
+            root_path: rootPath,
+            element: def,
+        };
+        cb = function (out) {
+            if (!fs.existsSync(buildPath)) {
+                fs.mkdirSync(buildPath);
+            }
+            fs.writeFile(buildPath + filename, out);
+        };
+        render(type + '.twig', data, references, cb);
+    }
+
     types.forEach(function (type) {
         if (!module[type]) {
             return;
         }
         module[type].forEach(function (def) {
-            var data, cb;
-            data = {
-                path: path,
-                type_tree: typeTree,
-                type: type.substring(0, type.length - 1),
-                root_path: rootPath,
-                element: def,
-            };
-            cb = function (out) {
-                if (!fs.existsSync(buildPath)) {
-                    fs.mkdirSync(buildPath);
-                }
-                fs.writeFile(buildPath + type.substring(0, type.length - 1) + '.' + def.name  + ".html", out);
-            };
-            render(type + '.twig', data, references, cb);
+            renderTemplate(type, def, shortType(type) + '.' + def.name  + ".html");
         });
     });
 
+    renderTemplate('mods', module, "index.html");
+
     if (module.mods) {
         module.mods.forEach(function (mod) {
-            dumpModule(path + '::' + mod.name, mod, typeTree.modsData[mod.name], references);
+            dumpModule(path + '::' + mod.name, mod, typeTree.submods[mod.name], references);
         });
     }
 }
 
-function createTypeTreeNode(parent) {
+function createTypeTreeNode(name, parent) {
     parent = parent || null;
 
     return {
+        // special metadata
+        name: name,
+        parent: parent,
+        submods: {},
+
+        // list of elements
         mods: {},
-        modsData: {},
         structs: {},
         enums: {},
         traits: {},
         typedefs: {},
         fns: {},
         reexports: {},
-        parent: parent,
     };
 }
 
@@ -179,8 +270,10 @@ if (data.schema !== '0.2.0') {
 }
 
 var crateName = data.name;
-var typeTree = createTypeTreeNode();
-var references = createTypeTreeNode();
+var typeTree = createTypeTreeNode(crateName);
+var references = createTypeTreeNode(crateName);
+
+data.mods[0].name = crateName;
 
 indexModule(crateName, data.mods[0], typeTree, references);
 dumpModule(crateName, data.mods[0], typeTree, references);

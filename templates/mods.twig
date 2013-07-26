@@ -1,0 +1,20 @@
+{% extends 'element.twig' %}
+
+{% block title %}
+    <h1>{% if type_tree.parent %}{{ breadcrumb(type_tree.parent, type_tree) }}{% endif %}{{ element.name }}</h1>
+{% endblock %}
+
+{% block definition %}
+    {% for type in ['mod', 'struct', 'enum', 'trait', 'typedef', 'fn', 'reexport'] %}
+        {% if type_tree[type ~ 's'] is not empty %}
+            <div class="block {{ type }}">
+                <h2>{{ (type ~ 's')|trans }}</h2>
+                {% for id, name in type_tree[type ~ 's'] %}
+                    {{ link_to_element(id, type_tree) }}<br />
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endfor %}
+{% endblock %}
+
+{% block docs %}{% endblock %}

@@ -2,7 +2,7 @@
 
 {% block content %}
     {% block title %}
-        <h1>{{ element.name }} ({{ element.type }})</h1>
+        <h1>{{ breadcrumb(type_tree) }}{{ element.name }}</h1>
     {% endblock %}
 
     {% block short_description %}
