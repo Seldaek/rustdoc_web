@@ -2,7 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="utf-8" />
-    <title>Rust Docs</title> {# TODO #}
+    <title>
+        {% block title %}
+            {% if type == 'mod' and type_tree.parent is not empty %}
+                {{ breadcrumb(type_tree.parent)|striptags }}{{ element.name }}
+            {% else %}
+                {{ breadcrumb(type_tree)|striptags|substring(0, -2) }}{{ type == 'mod' ? '' : '::' ~ element.name }}
+            {% endif %}
+            {% if project_title is not empty %} - {{ project_title }}{% endif %}
+        {% endblock %}
+    </title>
 
     {% block font %}
         <link href='http://fonts.googleapis.com/css?family=Oswald:700' rel='stylesheet' type='text/css'>
@@ -11,8 +20,9 @@
         <link rel="stylesheet" type="text/css" href="{{ root_path }}main.css">
     {% endblock %}
 
-    {# TODO #}
+    {# TODO
     <link rel="canonical" href="{{ path_to_current_version_page }}" />
+    #}
 </head>
 <body>
     <!--[if lte IE 8]>
@@ -22,43 +32,53 @@
     <section class="sidebar">
         <img src="http://www.rust-lang.org/logos/rust-logo-128x128-blk.png" />
 
-        <p class="location">
-            {% set tree = type_tree %}
-            {% if type == 'mod' and type_tree.parent is not empty %}{# render modules from their parent tree unless it is the root tree #}
-                {% set tree = type_tree.parent %}
-                {{ breadcrumb(type_tree.parent, type_tree)|substring(0, -2) }}
-            {% else %}
-                {{ breadcrumb(type_tree)|substring(0, -2) }}
-            {% endif %}
-        </p>
-
-        {% if type != 'mod' or type_tree.parent is not empty %}
-            {% for type in ['mod', 'struct', 'enum', 'trait', 'fn'] %}
-                {% if tree[type ~ 's'] is not empty %}
-                    <div class="block {{ type }}">
-                        <h2>{{ (type ~ 's')|trans }}</h2>
-                        {% for id, name in tree[type ~ 's'] %}
-                            <a class="{{ type }}{% if name == element.name %} current{% endif %}" href="{{ url_to_element(id, type_tree) }}">{{ name }}</a><br />
-                        {% endfor %}
-                    </div>
+        {% block sidebar %}
+            <p class="location">
+                {% set tree = type_tree %}
+                {% if type == 'mod' and type_tree.parent is not empty %}{# render modules from their parent tree unless it is the root tree #}
+                    {% set tree = type_tree.parent %}
+                    {{ breadcrumb(type_tree.parent, type_tree)|substring(0, -2) }}
+                {% elseif type != 'mod' %}
+                    {{ breadcrumb(type_tree)|substring(0, -2) }}
                 {% endif %}
-            {% endfor %}
-        {% endif %}
+            </p>
+
+            {% if type == 'mod' and type_tree.parent is empty %}
+                <div class="block crate">
+                    <h2>{{ 'crates'|trans }}</h2>
+                    {% for crate in crates %}
+                        <a href="{{ root_path }}{{ crate }}/index.html">{{ crate }}</a><br />
+                    {% endfor %}
+                </div>
+            {% else %}
+                {% for type in ['mod', 'struct', 'enum', 'trait', 'fn'] %}
+                    {% if tree[type ~ 's'] is not empty %}
+                        <div class="block {{ type }}">
+                            <h2>{{ (type ~ 's')|trans }}</h2>
+                            {% for id, name in tree[type ~ 's'] %}
+                                <a class="{{ type }}{% if name == element.name %} current{% endif %}" href="{{ url_to_element(id, type_tree) }}">{{ name }}</a><br />
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        {% endblock %}
     </section>
 
     <nav class="main">
     {% block nav %}
-        <a href="#TODO">About</a>
+        <a href="http://doc.rust-lang.org/doc/tutorial.html">Tutorial</a>
         <span class="separator"></span>
-        <a href="#TODO">Tutorial</a>
+        <a href="http://static.rust-lang.org/doc/rust.html">Manual</a>
         <span class="separator"></span>
-        <a class="current" href="#TODO">Documentation</a>
+        <a class="current" href="{{ root_path }}">Documentation</a>
         <span class="separator"></span>
-        <a href="#TODO">Releases</a>
+        <a href="https://github.com/mozilla/rust/wiki/Doc-releases">Releases</a>
     {% endblock %}
     </nav>
 
     <nav class="sub">
+    {% block subnav %}
         <form class="search-form js-only">
             <input class="search-input" name="search" />
             <button class="search-callout">Search</button>
@@ -67,6 +87,7 @@
             <option value="master">master</option>
             <option value="0.7">0.7</option>
         </select>
+    {% endblock %}
     </nav>
 
     <section class="content {{ type }}">

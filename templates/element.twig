@@ -1,20 +1,23 @@
 {% extends 'layout.twig' %}
 
 {% block content %}
-    {% block title %}
+    {% block name %}
         <h1>{{ breadcrumb(type_tree) }}<a class="{{ type }}" href="">{{ element.name }}</a></h1>
     {% endblock %}
 
     {% block short_description %}
-        {{ short_description(element.attrs.doc) }}
+        {{ short_description(element) }}
     {% endblock %}
 
     {% block definition %}{% endblock %}
 
-    {% block docs %}
-        {% if element.attrs.doc is not empty %}
+    {% block documentation %}
+        {% set longdesc = long_description(element) %}
+        {% if longdesc is not empty %}
             <h2>Documentation</h2>
-            {{ long_description(element.attrs.doc) }} {# TODO markdown render #}
+            {{ longdesc }} {# TODO markdown render #}
         {% endif %}
     {% endblock %}
+
+    {% block extra %}{% endblock %}
 {% endblock %}

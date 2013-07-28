@@ -21,6 +21,7 @@ var transTexts = {
     'typedefs': 'Type Definitions',
     'fns': 'Functions',
     'reexports': 'Re-exports',
+    'crates': 'Crates',
     'mod': 'Module',
     'struct': 'Struct',
     'enum': 'Enum',
@@ -52,6 +53,9 @@ Twig.extendFilter('substring', function (str, args) {
 var inputFile = "input.json";
 // TODO add favicon url to config
 // TODO add logo url to config
+// TODO add main menu urls to config
+// TODO add projectTitle to config
+var projectTitle = 'rustdoc_ng docs';
 
 var BUILD_TARGET = "build";
 
@@ -107,13 +111,25 @@ function render(template, vars, references, cb) {
     }
 
     // helpers
-    vars.short_description = function (docblock) {
-        docblock = docblock || '';
-        return docblock.substring(0, docblock.indexOf('\n')).replace(/\s+$/, '');
+    vars.short_description = function (elem) {
+        var docblock = '';
+        elem.attrs.forEach(function (attr) {
+            if (attr.doc) {
+                docblock = attr.doc;
+            }
+        });
+
+        return docblock.indexOf('\n') > -1 ? docblock.substring(0, docblock.indexOf('\n')).replace(/\s+$/, '') : docblock;
     };
-    vars.long_description = function (docblock) {
-        docblock = docblock || '';
-        return docblock.substring(docblock.indexOf('\n')).replace(/^\s+/, '');
+    vars.long_description = function (elem) {
+        var docblock = '';
+        elem.attrs.forEach(function (attr) {
+            if (attr.doc) {
+                docblock = attr.doc;
+            }
+        });
+
+        return docblock.indexOf('\n') > -1 ? docblock.substring(docblock.indexOf('\n')).replace(/^\s+/, '') : '';
     };
     vars.link_to_element = function (id, currentTree) {
         var modPrefix = '';
@@ -148,24 +164,55 @@ function render(template, vars, references, cb) {
 
         return out + '::';
     };
+    vars.extract_docs = function (elem) {
+        var docs = '';
+        elem.attrs.forEach(function (attr) {
+            if (attr.doc) {
+                docs = attr.doc;
+            }
+        });
+
+        return docs;
+    };
+    vars.short_enum_type = function (type, currentTree) {
+        if (type.type === 'c-like') {
+            if (type.value) {
+                return ' = ' + type.value;
+            }
+            return '';
+        }
+
+        return vars.short_type(type, currentTree);
+    };
     vars.short_type = function shortType(type, currentTree) {
         var types;
+
+        if (!currentTree) {
+            throw new Error('Missing currentTree arg #2');
+        }
 
         if (type.type === 'primitive') {
             return type.value;
         }
         if (type.type === 'resolved') {
             if (!references[type.value]) {
-                return '<ID:'+type.value+'>'; // TODO fix this
+                return '&lt;ID:'+type.value+'&gt;'; // TODO fix this
                 throw new Error('Invalid resolved ref id: ' + type.value);
             }
 
             return vars.link_to_element(type.value, currentTree);
         }
         if (type.type === 'tuple') {
-            types = type.value.map(function (t) {
-                return shortType(t, currentTree);
-            }).join(', ');
+            if (type.members) {
+                types = type.members.map(function (t) {
+                    return shortType(t, currentTree);
+                }).join(', ');
+            } else {
+                // TODO is this path still relevant?
+                types = type.value.map(function (t) {
+                    return shortType(t, currentTree);
+                }).join(', ');
+            }
 
             return '(' + types + ')';
         }
@@ -212,7 +259,7 @@ function indexModule(path, module, typeTree, references) {
     });
 }
 
-function dumpModule(path, module, typeTree, references) {
+function dumpModule(path, module, typeTree, references, crates) {
     var rootPath, matches,
         buildPath = BUILD_TARGET + "/" + path.replace(/::/g, '/') + '/',
         types = ['structs', 'enums', 'traits', 'typedefs', 'fns', 'reexports'];
@@ -228,6 +275,8 @@ function dumpModule(path, module, typeTree, references) {
             type: shortType(type),
             root_path: rootPath,
             element: def,
+            project_title: projectTitle,
+            crates: crates,
         };
         cb = function (out) {
             if (!fs.existsSync(buildPath)) {
@@ -276,6 +325,23 @@ function createTypeTreeNode(name, parent) {
     };
 }
 
+function renderMainIndex(crates) {
+    var data, cb;
+    data = {
+        root_path: '',
+        project_title: projectTitle,
+        crates: crates,
+    };
+    cb = function (out) {
+        fs.writeFile(BUILD_TARGET + '/index.html', out);
+    };
+    if (crates.length === 1) {
+        cb('<DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=' + crates[0] + '/index.html"></head><body></body></html>');
+    } else {
+        render('crates.twig', data, {}, cb);
+    }
+}
+
 var data = JSON.parse(fs.readFileSync(inputFile));
 if (data.schema !== '0.2.0') {
     throw new Error('Unsupported schema ' + data.schema);
@@ -284,8 +350,11 @@ if (data.schema !== '0.2.0') {
 var crateName = data.name;
 var typeTree = createTypeTreeNode(crateName);
 var references = createTypeTreeNode(crateName);
+var crates = [crateName];
 
 data.mods[0].name = crateName;
 
 indexModule(crateName, data.mods[0], typeTree, references);
-dumpModule(crateName, data.mods[0], typeTree, references);
+dumpModule(crateName, data.mods[0], typeTree, references, crates);
+
+renderMainIndex(crates);

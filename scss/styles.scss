@@ -49,6 +49,9 @@
 .content {
     background: #f3f3f3;
     padding: $contentPadding $contentPadding $contentPadding $contentPadding*2;
+    h1 {
+        margin-top: 0;
+    }
     h1, h2 {
         margin-left: -$contentPadding;
     }
@@ -73,6 +76,14 @@
         }
         &.fn {
             background-color: $fnColorLight;
+        }
+    }
+
+    td {
+        vertical-align: top;
+        padding-bottom: 10px;
+        &:first-child {
+           padding-right: $contentPadding;
         }
     }
 }

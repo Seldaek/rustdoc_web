@@ -5,9 +5,20 @@
 <pre class="{{ type }}">
 enum {{ element.name }} {
 {% for variant in element.variants %}
-    {{ variant.name }}, {% if variant.attrs.doc %}// {{ variant.attrs.doc }}{% endif %}
-
+    {{ variant.name }}{{ short_enum_type(variant.kind, type_tree) }},
 {% endfor %}
 }
 </pre>
+{% endblock %}
+
+{% block extra %}
+    <h2>Variants</h2>
+    <table>
+        {% for variant in element.variants %}
+            <tr>
+                <td>{{ variant.name }}</td>
+                <td>{{ extract_docs(variant) }}</td> {# TODO markdown #}
+            </tr>
+        {% endfor %}
+    </table>
 {% endblock %}

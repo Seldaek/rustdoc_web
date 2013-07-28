@@ -3,8 +3,6 @@
 {% block definition %}
 <h2>Definition</h2>
 <pre class="{{ type }}">
-{# TODO #}
-fn {{ element.name }} () {
-}
+fn {{ element.name }} ({% for arg in element.decl.arguments %}??: {{ short_type(arg.type, type_tree) }}{% if not loop.last %}, {% endif %}{% endfor %}){% if element.decl.output.type != 'unit' %}: {{ short_type(element.decl.output, type_tree) }}{% endif %}
 </pre>
 {% endblock %}
