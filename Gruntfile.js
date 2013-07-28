@@ -24,11 +24,23 @@ module.exports = function (grunt) {
                     'build/main.css': 'scss/main.scss'
                 }
             }
+        },
+        connect: {
+            server: {
+                options: {
+                    port: 8000,
+                    base: './build',
+                    keepalive: true
+                }
+            }
         }
     });
 
     grunt.loadNpmTasks('grunt-sass');
     grunt.loadNpmTasks('grunt-exec');
+    grunt.loadNpmTasks('grunt-contrib-copy');
+    grunt.loadNpmTasks('grunt-contrib-connect');
 
-    grunt.registerTask('default', ['exec', 'sass']);
+    grunt.registerTask('default', ['exec', 'sass', 'copy']);
+    grunt.registerTask('browse', ['connect']);
 };
