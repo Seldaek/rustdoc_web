@@ -20,6 +20,8 @@ Author
 
 Jordi Boggiano - <j.boggiano@seld.be>
 
+Docs design by [Meret Vollenweider](http://meret.com)
+
 License
 -------
 

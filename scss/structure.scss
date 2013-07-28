@@ -1,0 +1,13 @@
+html, body {
+    height: 100%;
+}
+
+.sidebar {
+    width: $sidebarWidth;
+    float: left;
+    min-height: 100%;
+}
+
+.content, nav {
+    max-width: 960px;
+}

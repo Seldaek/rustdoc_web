@@ -1,0 +1,133 @@
+.js-only {
+    display: none;
+}
+
+.sidebar {
+    background: #e9e9e9;
+    padding: $sidebarPadding;
+
+    img {
+        margin: $contentPadding auto;
+        display: block;
+    }
+
+    .location {
+        margin-bottom: $sidebarPadding;
+    }
+}
+
+.sidebar .block, pre {
+    background: #fff;
+}
+.sidebar .block, pre, .content {
+    border-bottom: 2px solid black;
+    &.trait {
+        border-color: $traitColor;
+    }
+    &.mod {
+        border-color: $modColor;
+    }
+    &.enum {
+        border-color: $enumColor;
+    }
+    &.struct {
+        border-color: $structColor;
+    }
+    &.fn {
+        border-color: $fnColor;
+    }
+}
+
+.block {
+    padding: $sidebarPadding;
+    margin-bottom: $sidebarPadding;
+    h2 {
+        margin-top: 0;
+    }
+}
+
+.content {
+    background: #f3f3f3;
+    padding: $contentPadding $contentPadding $contentPadding $contentPadding*2;
+    h1, h2 {
+        margin-left: -$contentPadding;
+    }
+
+    pre {
+        padding: $contentPadding;
+    }
+
+    .highlighted {
+        color: #000;
+        &.trait {
+            background-color: $traitColorLight;
+        }
+        &.mod {
+            background-color: $modColorLight;
+        }
+        &.enum {
+            background-color: $enumColorLight;
+        }
+        &.struct {
+            background-color: $structColorLight;
+        }
+        &.fn {
+            background-color: $fnColorLight;
+        }
+    }
+}
+
+nav {
+    &.main {
+        padding: $contentPadding 0;
+        text-align: center;
+        .current {
+            border-top: 1px solid #000;
+            border-bottom: 1px solid #000;
+        }
+        .separator {
+            border: 1px solid #000;
+            display: inline-block;
+            height: $menuSeparator;
+            margin: 0 $contentPadding;
+        }
+    }
+    &.sub {
+        form {
+            display: inline;
+        }
+        text-align: right;
+    }
+    border-bottom: 1px solid #e0e0e0;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+nav, .content {
+    margin-left: $sidebarWidth + $contentPadding;
+    margin-right: $contentPadding;
+}
+
+a {
+    text-decoration: none;
+    color: #000;
+}
+
+.content a, .block a.current {
+    font-weight: bold;
+    &.trait {
+        color: $traitColorDark;
+    }
+    &.mod {
+        color: $modColorDark;
+    }
+    &.enum {
+        color: $enumColorDark;
+    }
+    &.struct {
+        color: $structColorDark;
+    }
+    &.fn {
+        color: $fnColorDark;
+    }
+}

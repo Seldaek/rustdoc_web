@@ -13,6 +13,13 @@ module.exports = function (grunt) {
                 }
             }
         },
+        copy: {
+            all: {
+                files: [
+                    {expand: true, src: ['js/**'], dest: 'build/'}
+                ]
+            }
+        },
         sass: {
             dist: {
                 options: {

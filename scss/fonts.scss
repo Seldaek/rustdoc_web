@@ -1,0 +1,26 @@
+body {
+    font: $contentFont;
+}
+
+h1, .sidebar .location {
+    font: $titleFont;
+}
+
+h2, h3, h4 {
+    font: $subtitleFont;
+    text-transform: uppercase;
+}
+
+code, pre {
+    font: $codeFont;
+}
+
+nav {
+    font: $menuFont;
+    text-transform: uppercase;
+}
+
+nav.sub {
+    font: $submenuFont;
+    text-transform: uppercase;
+}

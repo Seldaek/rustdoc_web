@@ -2,7 +2,7 @@
 
 {% block content %}
     {% block title %}
-        <h1>{{ breadcrumb(type_tree) }}{{ element.name }}</h1>
+        <h1>{{ breadcrumb(type_tree) }}<a class="{{ type }}" href="">{{ element.name }}</a></h1>
     {% endblock %}
 
     {% block short_description %}
@@ -12,6 +12,9 @@
     {% block definition %}{% endblock %}
 
     {% block docs %}
-        {{ long_description(element.attrs.doc) }} {# TODO markdown render #}
+        {% if element.attrs.doc is not empty %}
+            <h2>Documentation</h2>
+            {{ long_description(element.attrs.doc) }} {# TODO markdown render #}
+        {% endif %}
     {% endblock %}
 {% endblock %}

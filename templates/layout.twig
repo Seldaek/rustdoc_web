@@ -1,27 +1,82 @@
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
+    <meta charset="utf-8" />
     <title>Rust Docs</title> {# TODO #}
 
-    <link rel="stylesheet" type="text/css" href="{{ root_path }}main.css">
+    {% block font %}
+        <link href='http://fonts.googleapis.com/css?family=Oswald:700' rel='stylesheet' type='text/css'>
+    {% endblock %}
+    {% block css %}
+        <link rel="stylesheet" type="text/css" href="{{ root_path }}main.css">
+    {% endblock %}
 
     {# TODO #}
     <link rel="canonical" href="{{ path_to_current_version_page }}" />
 </head>
 <body>
+    <!--[if lte IE 8]>
+    <div class="warning">This old browser is unsupported and will most likely display funky things</div>
+    <![endif]-->
 
-<div class="sidebar">
-    <div class="block {{ type }}">
-        <h2>{{ (type ~ 's')|trans }}</h2>
-        {% for id, name in type_tree[type ~ 's'] %}
-            <a{% if name == element.name %} class="current"{% endif %} href="{{ url_to_element(id, type_tree) }}">{{ name }}</a><br />
-        {% endfor %}
-    </div>
-</div>
+    <section class="sidebar">
+        <img src="http://www.rust-lang.org/logos/rust-logo-128x128-blk.png" />
 
-<div>
-{% block content %}
-{% endblock %}
-</div>
+        <p class="location">
+            {% set tree = type_tree %}
+            {% if type == 'mod' and type_tree.parent is not empty %}{# render modules from their parent tree unless it is the root tree #}
+                {% set tree = type_tree.parent %}
+                {{ breadcrumb(type_tree.parent, type_tree)|substring(0, -2) }}
+            {% else %}
+                {{ breadcrumb(type_tree)|substring(0, -2) }}
+            {% endif %}
+        </p>
 
+        {% if type != 'mod' or type_tree.parent is not empty %}
+            {% for type in ['mod', 'struct', 'enum', 'trait', 'fn'] %}
+                {% if tree[type ~ 's'] is not empty %}
+                    <div class="block {{ type }}">
+                        <h2>{{ (type ~ 's')|trans }}</h2>
+                        {% for id, name in tree[type ~ 's'] %}
+                            <a class="{{ type }}{% if name == element.name %} current{% endif %}" href="{{ url_to_element(id, type_tree) }}">{{ name }}</a><br />
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endfor %}
+        {% endif %}
+    </section>
+
+    <nav class="main">
+    {% block nav %}
+        <a href="#TODO">About</a>
+        <span class="separator"></span>
+        <a href="#TODO">Tutorial</a>
+        <span class="separator"></span>
+        <a class="current" href="#TODO">Documentation</a>
+        <span class="separator"></span>
+        <a href="#TODO">Releases</a>
+    {% endblock %}
+    </nav>
+
+    <nav class="sub">
+        <form class="search-form js-only">
+            <input class="search-input" name="search" />
+            <button class="search-callout">Search</button>
+        </form>
+        <select class="version-selector js-only">
+            <option value="master">master</option>
+            <option value="0.7">0.7</option>
+        </select>
+    </nav>
+
+    <section class="content {{ type }}">
+    {% block content %}
+    {% endblock %}
+    </section>
+
+    {% block js %}
+        <script src="{{ root_path }}js/lib/jquery-2.0.3.min.js"></script>
+        <script src="{{ root_path }}js/main.js"></script>
+    {% endblock %}
 </body>
 </html>

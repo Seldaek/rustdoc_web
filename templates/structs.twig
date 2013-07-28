@@ -1,9 +1,10 @@
 {% extends 'element.twig' %}
 
 {% block definition %}
+<h2>Definition</h2>
 
 {% if element.type == 'Plain' %}
-<pre>
+<pre class="{{ type }}">
 struct {{ element.name }} {
 {% for field in element.fields %}
     {{ field.name }}: {{ short_type(field.type, type_tree) }};
@@ -11,11 +12,11 @@ struct {{ element.name }} {
 }
 </pre>
 {% elseif element.type == 'Tuple' %}
-    <pre>struct {{ element.name }}({% for field in element.fields %}{{ short_type(field.type, type_tree) }}{% if not loop.last %}, {% endif %}{% endfor %})</pre>
+    <pre class="{{ type }}">struct {{ element.name }}({% for field in element.fields %}{{ short_type(field.type, type_tree) }}{% if not loop.last %}, {% endif %}{% endfor %})</pre>
 {% elseif element.type == 'Unit' %}
-    <pre>struct {{ element.name }};</pre>
+    <pre class="{{ type }}">struct {{ element.name }};</pre>
 {% else %}
-    <pre>Unkwown struct type: {{ element.type }}</pre>
+    <pre class="{{ type }}">Unkwown struct type: {{ element.type }}</pre>
 {% endif %}
 
 {% endblock %}

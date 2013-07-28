@@ -38,9 +38,20 @@ Twig.extendFilter('trans', function (str) {
     return str;
 });
 
+Twig.extendFilter('substring', function (str, args) {
+    var from = args[0], to = args[1];
+    if (to < 0) {
+        to = str.length + to;
+    }
+
+    return str.substring(from, to);
+});
+
 // params
-// TODO support building more than one crate at once
+// TODO support building more than one crate at once and more than one version of a crate
 var inputFile = "input.json";
+// TODO add favicon url to config
+// TODO add logo url to config
 
 var BUILD_TARGET = "build";
 
@@ -105,11 +116,12 @@ function render(template, vars, references, cb) {
         return docblock.substring(docblock.indexOf('\n')).replace(/^\s+/, '');
     };
     vars.link_to_element = function (id, currentTree) {
-        if (references[id].tree === currentTree) {
-            return '<a href="' + vars.url_to_element(id, currentTree) + '">' + references[id].def.name + '</a>';
+        var modPrefix = '';
+        if (references[id].tree !== currentTree) {
+            modPrefix = modPath(references[id].tree);
         }
 
-        return '<a href="' + vars.url_to_element(id, currentTree) + '">' + modPath(references[id].tree) + references[id].def.name + '</a>';
+        return '<a class="' + shortType(references[id].type) + '" href="' + vars.url_to_element(id, currentTree) + '">' + modPrefix + references[id].def.name + '</a>';
     };
     vars.url_to_element = function (id, currentTree) {
         if (references[id].type === 'mods') {
@@ -131,10 +143,10 @@ function render(template, vars, references, cb) {
         path.reverse();
 
         path.forEach(function (targetTree) {
-            out += '<a href="' + relativePath(currentTree, targetTree) + 'index.html">' + targetTree.name + '</a>::';
+            out += '&#8203;' + (out ? '::' : '') + '<a href="' + relativePath(currentTree, targetTree) + 'index.html">' + targetTree.name + '</a>';
         });
 
-        return out;
+        return out + '::';
     };
     vars.short_type = function shortType(type, currentTree) {
         var types;
