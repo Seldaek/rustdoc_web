@@ -55,7 +55,8 @@ var inputFile = "input.json";
 // TODO add logo url to config
 // TODO add main menu urls to config
 // TODO add projectTitle to config
-var projectTitle = 'rustdoc_ng docs';
+var projectTitle = 'libstd docs';
+var baseSourceUrl = 'https://github.com/mozilla/rust/blob/master/src/libstd/';
 
 var BUILD_TARGET = "build";
 
@@ -184,6 +185,16 @@ function render(template, vars, references, cb) {
 
         return vars.short_type(type, currentTree);
     };
+    vars.sort = function (obj) {
+        var key, elems = [];
+        for (key in obj) {
+            elems.push({id: key, name: obj[key]});
+        }
+
+        return elems.sort(function (a, b) {
+            return a.name.localeCompare(b.name);
+        });
+    };
     vars.short_type = function shortType(type, currentTree) {
         var types;
 
@@ -203,16 +214,10 @@ function render(template, vars, references, cb) {
             return vars.link_to_element(type.value, currentTree);
         }
         if (type.type === 'tuple') {
-            if (type.members) {
-                types = type.members.map(function (t) {
-                    return shortType(t, currentTree);
-                }).join(', ');
-            } else {
-                // TODO is this path still relevant?
-                types = type.value.map(function (t) {
-                    return shortType(t, currentTree);
-                }).join(', ');
-            }
+            types = type.members === undefined ? type.value : type.members;
+            types = types.map(function (t) {
+                return shortType(t, currentTree);
+            }).join(', ');
 
             return '(' + types + ')';
         }
@@ -228,8 +233,32 @@ function render(template, vars, references, cb) {
         if (type.type === 'string') {
             return 'str';
         }
+        if (type.type === 'bottom') {
+            return '!';
+        }
+        if (type.type === 'closure') {
+            return '&lt;CLOSURE&gt;'; // TODO fix this once the json is correct
+        }
+        if (type.type === 'generic') {
+            return references[type.value].def.name;
+        }
+        if (type.type === 'unit') { // "nil" return value
+            return '';
+        }
 
         throw new Error('Unknown type: ' + type.type + ' with value ' + JSON.stringify(type.value) + ', could not parse');
+    };
+    vars.source_url = function (element) {
+        var matches;
+        if (!element.source) {
+            throw new Error('Element has no source: ' + JSON.stringify(element));
+        }
+        matches = element.source.match(/^([a-z0-9_.\/-]+):(\d+):\d+:? (\d+):\d+$/i);
+        if (!matches) {
+            throw new Error('Could not parse element.source for ' + JSON.stringify(element));
+        }
+
+        return baseSourceUrl + matches[1] + '#L' + matches[2] + '-' + matches[3];
     };
 
     Twig.renderFile("templates/" + template, vars, function (dummy, out) { cb(out); });
@@ -252,6 +281,11 @@ function indexModule(path, module, typeTree, references) {
                 if (def.id === undefined) {
                     throw new Error('Missing id on ' + JSON.stringify(def));
                 }
+            }
+            if (def.generics && def.generics.typarams) {
+                def.generics.typarams.forEach(function (typaram) {
+                    references[typaram.id] = {type: 'typaram', def: typaram, tree: typeTree};
+                });
             }
             typeTree[type][def.id] = name;
             references[def.id] = {type: type, def: def, tree: typeTree};
@@ -278,10 +312,10 @@ function dumpModule(path, module, typeTree, references, crates) {
             project_title: projectTitle,
             crates: crates,
         };
+        if (!fs.existsSync(buildPath)) {
+            fs.mkdirSync(buildPath);
+        }
         cb = function (out) {
-            if (!fs.existsSync(buildPath)) {
-                fs.mkdirSync(buildPath);
-            }
             fs.writeFile(buildPath + filename, out);
         };
         render(type + '.twig', data, references, cb);

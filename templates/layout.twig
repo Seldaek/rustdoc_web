@@ -55,8 +55,8 @@
                     {% if tree[type ~ 's'] is not empty %}
                         <div class="block {{ type }}">
                             <h2>{{ (type ~ 's')|trans }}</h2>
-                            {% for id, name in tree[type ~ 's'] %}
-                                <a class="{{ type }}{% if name == element.name %} current{% endif %}" href="{{ url_to_element(id, type_tree) }}">{{ name }}</a><br />
+                            {% for item in sort(tree[type ~ 's']) %}
+                                <a class="{{ type }}{% if item.name == element.name %} current{% endif %}" href="{{ url_to_element(item.id, type_tree) }}">{{ item.name }}</a><br />
                             {% endfor %}
                         </div>
                     {% endif %}
@@ -94,6 +94,8 @@
     {% block content %}
     {% endblock %}
     </section>
+
+    <section class="footer"></section>
 
     {% block js %}
         <script src="{{ root_path }}js/lib/jquery-2.0.3.min.js"></script>

@@ -8,11 +8,13 @@
     {% for type in ['mod', 'struct', 'enum', 'trait', 'typedef', 'fn', 'reexport'] %}
         {% if type_tree[type ~ 's'] is not empty %}
             <h2>{{ (type ~ 's')|trans }}</h2>
-            {% for id, name in type_tree[type ~ 's'] %}
-                {{ link_to_element(id, type_tree) }}<br />
+            {% for item in sort(type_tree[type ~ 's']) %}
+                {{ link_to_element(item.id, type_tree) }}<br />
             {% endfor %}
         {% endif %}
     {% endfor %}
 {% endblock %}
+
+{% block source %}{% endblock %}
 
 {% block documentation %}{% endblock %}
