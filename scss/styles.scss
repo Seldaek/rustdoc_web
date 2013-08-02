@@ -1,9 +1,9 @@
-.js-only {
+.js-only, .hidden {
     display: none;
 }
 
 .sidebar {
-    background: #e9e9e9;
+    background: $sidebarBgColor;
     padding: $sidebarPadding;
 
     img {
@@ -47,7 +47,7 @@
 }
 
 .content {
-    background: #f3f3f3;
+    background: $contentBgColor;
     padding: $contentPadding $contentPadding $contentPadding $contentPadding*2;
     h1 {
         margin-top: 0;
@@ -61,7 +61,10 @@
     }
 
     .highlighted {
-        color: #000;
+        cursor: pointer;
+        &, a {
+            color: #000 !important;
+        }
         &.trait {
             background-color: $traitColorLight;
         }
@@ -83,9 +86,12 @@
         float: right;
     }
 
+    table {
+        border-spacing: 0 5px;
+        border-collapse: separate;
+    }
     td {
         vertical-align: top;
-        padding-bottom: 10px;
         &:first-child {
            padding-right: $contentPadding;
         }
@@ -144,5 +150,62 @@ a {
     }
     &.fn {
         color: $fnColorDark;
+    }
+}
+
+.search-results {
+    .desc {
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        display: block;
+    }
+}
+
+#help {
+    background: $sidebarBgColor;
+    $helpWidth: 550px;
+    $helpHeight: 250px;
+
+    @include border-radius(4px);
+    @include box-shadow(0, 0, 6px, rgba(0,0,0,.2));
+
+    position: absolute;
+    top: 300px;
+    left: 50%;
+    margin-top: -$helpHeight / 2;
+    margin-left: -$helpWidth / 2;
+    width: $helpWidth;
+    height: $helpHeight;
+    border: 1px solid $edgeColor;
+
+    .shortcuts {
+        dt {
+            float: left;
+            @include border-radius(3px);
+            border: 1px solid $edgeColor;
+            background: #fff;
+            width: 23px;
+            text-align: center;
+            clear: left;
+            display: block;
+            margin-top: -1px;
+        }
+        dd {
+            margin: 5px 33px;
+        }
+    }
+    .infos {
+        padding-left: 0;
+    }
+
+    h1 {
+        margin-top: 0;
+    }
+
+    div {
+        width: 50%;
+        float: left;
+        padding: $contentPadding;
     }
 }

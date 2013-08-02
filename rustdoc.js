@@ -1,4 +1,4 @@
-/*jslint node: true, stupid: true, es5: true */
+/*jslint node: true, stupid: true, es5: true, regexp: true */
 "use strict";
 
 /*
@@ -68,24 +68,42 @@ function shortType(type) {
     return type.substring(0, type.length - 1);
 }
 
+function extractDocs(elem) {
+    var docs = '';
+    elem.attrs.forEach(function (attr) {
+        if (attr.doc) {
+            docs = attr.doc.toString();
+        }
+    });
+
+    return docs;
+}
+
+function shortDescription(elem) {
+    var match, docblock = extractDocs(elem);
+
+    match = docblock.match(/^([\s\S]+?)\r?\n[ \t\*]+\r?\n([\s\S]+)/);
+    return match ? match[1] : docblock;
+}
+
+function getPath(tree) {
+    var bits = [];
+    bits.push(tree.name || '');
+    while (tree.parent) {
+        tree = tree.parent;
+        bits.push(tree.name);
+    }
+
+    bits.reverse();
+
+    return bits;
+}
+
 function render(template, vars, references, cb) {
     vars.settings = {
         views: "templates/",
         'twig options': { strict_variables: true }
     };
-
-    function getPath(tree) {
-        var bits = [];
-        bits.push(tree.name || '');
-        while (tree.parent) {
-            tree = tree.parent;
-            bits.push(tree.name);
-        }
-
-        bits.reverse();
-
-        return bits;
-    }
 
     function relativePath(fromTree, toTree) {
         var fromPath, toPath;
@@ -112,25 +130,12 @@ function render(template, vars, references, cb) {
     }
 
     // helpers
-    vars.short_description = function (elem) {
-        var docblock = '';
-        elem.attrs.forEach(function (attr) {
-            if (attr.doc) {
-                docblock = attr.doc;
-            }
-        });
-
-        return docblock.indexOf('\n') > -1 ? docblock.substring(0, docblock.indexOf('\n')).replace(/\s+$/, '') : docblock;
-    };
+    vars.short_description = shortDescription;
     vars.long_description = function (elem) {
-        var docblock = '';
-        elem.attrs.forEach(function (attr) {
-            if (attr.doc) {
-                docblock = attr.doc;
-            }
-        });
+        var match, docblock = extractDocs(elem);
 
-        return docblock.indexOf('\n') > -1 ? docblock.substring(docblock.indexOf('\n')).replace(/^\s+/, '') : '';
+        match = docblock.match(/^([\s\S]+?)\r?\n[ \t\*]+\r?\n([\s\S]+)/);
+        return match ? match[2] : '';
     };
     vars.link_to_element = function (id, currentTree) {
         var modPrefix = '';
@@ -165,16 +170,7 @@ function render(template, vars, references, cb) {
 
         return out + '::';
     };
-    vars.extract_docs = function (elem) {
-        var docs = '';
-        elem.attrs.forEach(function (attr) {
-            if (attr.doc) {
-                docs = attr.doc;
-            }
-        });
-
-        return docs;
-    };
+    vars.extract_docs = extractDocs;
     vars.short_enum_type = function (type, currentTree) {
         if (type.type === 'c-like') {
             if (type.value) {
@@ -264,7 +260,7 @@ function render(template, vars, references, cb) {
     Twig.renderFile("templates/" + template, vars, function (dummy, out) { cb(out); });
 }
 
-function indexModule(path, module, typeTree, references) {
+function indexModule(path, module, typeTree, references, searchIndex) {
     var types = ['mods', 'structs', 'enums', 'traits', 'typedefs', 'fns', 'reexports'];
 
     types.forEach(function (type) {
@@ -276,7 +272,7 @@ function indexModule(path, module, typeTree, references) {
             if (type === 'mods') {
                 def.id = path + name;
                 typeTree.submods[name] = createTypeTreeNode(name, typeTree);
-                indexModule(path + '::' + name, def, typeTree.submods[name], references);
+                indexModule(path + '::' + name, def, typeTree.submods[name], references, searchIndex);
             } else {
                 if (def.id === undefined) {
                     throw new Error('Missing id on ' + JSON.stringify(def));
@@ -288,6 +284,7 @@ function indexModule(path, module, typeTree, references) {
                 });
             }
             typeTree[type][def.id] = name;
+            searchIndex.push({type: shortType(type), name: name, path: getPath(typeTree).join('::'), desc: shortDescription(def)});
             references[def.id] = {type: type, def: def, tree: typeTree};
         });
     });
@@ -385,10 +382,13 @@ var crateName = data.name;
 var typeTree = createTypeTreeNode(crateName);
 var references = createTypeTreeNode(crateName);
 var crates = [crateName];
+var searchIndex = [];
 
 data.mods[0].name = crateName;
 
-indexModule(crateName, data.mods[0], typeTree, references);
+indexModule(crateName, data.mods[0], typeTree, references, searchIndex);
+fs.writeFile(BUILD_TARGET + '/search-index.js', "searchIndex = " + JSON.stringify(searchIndex));
+searchIndex = null;
 dumpModule(crateName, data.mods[0], typeTree, references, crates);
 
 renderMainIndex(crates);
