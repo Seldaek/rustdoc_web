@@ -91,7 +91,7 @@
         }
 
         function showResults(resultSet) {
-            var output, query = getQuery();
+            var output, shown, query = getQuery();
 
             currentResults = query.id;
             output = '<h1>Results for ' + query.query + (query.type ? ' (type: ' + query.type + ')' : '') + '</h1>';
@@ -109,13 +109,19 @@
             }
 
             if (resultSet.getSize() > 0) {
+                shown = [];
+
                 resultSet.forEach(function (entry) {
                     var item, name, type;
 
                     if (entry instanceof fullproof.ScoredElement) {
                         entry = entry.value;
                     }
+                    if (shown[entry]) {
+                        return;
+                    }
 
+                    shown[entry] = true;
                     item = data[entry];
                     name = item.name;
                     type = item.type;
