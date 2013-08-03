@@ -241,19 +241,25 @@ function render(template, vars, references, cb) {
         case 'bottom':
             return '!';
         case 'closure':
-            return '&lt;CLOSURE&gt;'; // TODO fix this once the json is correct
+            return vars.render_fn(type.value, currentTree, 'closure');
         case 'generic':
             return references[type.value].def.name;
         case 'unit': // "nil" return value
             return '';
         case 'barefn':
-            return (type.value.abi ? 'extern ' + type.value.abi + ' ' : '') + vars.render_fn(type.value, currentTree);
+            return (type.value.abi ? 'extern ' + type.value.abi + ' ' : '') + vars.render_fn(type.value, currentTree, 'barefn');
         }
 
         throw new Error('Can not render short type: ' + type.type + ' with value ' + JSON.stringify(type.value) + ' of type ' + (realType || type.type));
     };
-    vars.render_fn = function (fn, currentTree) {
-        var output = 'fn' + (fn.name ? ' ' + fn.name : '') + vars.render_generics(fn) + '(';
+    vars.render_fn = function (fn, currentTree, fnType) {
+        var output = '';
+
+        if (fnType === 'closure' && fn.onceness === 'once') {
+            output += 'once ';
+        }
+
+        output += 'fn' + (fn.name ? ' ' + fn.name : '') + vars.render_generics(fn, fnType) + '(';
         output += fn.decl.arguments.map(function (arg) {
             return (arg.name ? arg.name + ': ' : '') + vars.short_type(arg.type, currentTree);
         }).join(', ');
@@ -265,14 +271,14 @@ function render(template, vars, references, cb) {
 
         return output;
     };
-    vars.render_generics = function (element) {
+    vars.render_generics = function (element, fnType) {
         var typ, lt, output = '';
 
-        if (!element.generics) {
-            if (element.abi) {
-                return '';
-            }
-            throw new Error('Element has no generics defined ' + JSON.stringify(element));
+        if (fnType === 'barefn' || fnType === 'closure') {
+            element.generics = {typarams: [], lifetimes: element.lifetimes};
+        }
+        if (!element.generics || element.generics.typarams === undefined || element.generics.lifetimes === undefined) {
+            throw new Error('Element has invalid generics defined ' + JSON.stringify(element));
         }
 
         typ = element.generics.typarams;
