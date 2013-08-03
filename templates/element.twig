@@ -2,7 +2,7 @@
 
 {% block content %}
     {% block source %}
-        <a class="source" title="View sources" href="{{ source_url(element) }}">[src]</a>
+        <a class="source" title="View sources" href="{{ source_url(element, crate) }}">[src]</a>
     {% endblock %}
     {% block name %}
         <h1>{{ breadcrumb(type_tree) }}<a class="{{ type }}" href="">{{ element.name }}</a></h1>

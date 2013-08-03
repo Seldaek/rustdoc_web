@@ -1,8 +1,6 @@
 {% extends 'element.twig' %}
 
 {% block definition %}
-<h2>Definition</h2>
-<pre class="{{ type }}">
-fn {{ element.name }}{% if element.generics.typarams.length > 0 %}&lt;{% for param in element.generics.typarams %}{{ param.name }}{% if not loop.last %}, {% endif %}{% endfor %}&gt;{% endif %}({% for arg in element.decl.arguments %}{{ arg.name }}: {{ short_type(arg.type, type_tree) }}{% if not loop.last %}, {% endif %}{% endfor %}){% if element.decl.output.type != 'unit' %} -&gt; {{ short_type(element.decl.output, type_tree) }}{% endif %}
-</pre>
+    <h2>Definition</h2>
+    <pre class="{{ type }}">{{ render_fn(element, type_tree) }}</pre>
 {% endblock %}

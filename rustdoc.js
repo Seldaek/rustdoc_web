@@ -11,7 +11,17 @@
  */
 
 var Twig = require("twig"),
-    fs = require("fs");
+    fs = require("fs"),
+    globsync = require('glob-whatev');
+
+// params (inputDir, outputDir, faviconUrl, logoUrl, menu, title, baseSourceUrls)
+var config = JSON.parse(fs.readFileSync('config.json'));
+config.inputDir = config.inputDir || "input";
+config.outputDir = config.outputDir.replace(/\/*$/, '/') || "build/";
+config.logoUrl = config.logoUrl || "http://www.rust-lang.org/logos/rust-logo-128x128-blk.png";
+config.baseSourceUrls = config.baseSourceUrls || {};
+config.menu = config.menu || [];
+config.title = config.title || '';
 
 var transTexts = {
     'mods': 'Modules',
@@ -48,23 +58,27 @@ Twig.extendFilter('substring', function (str, args) {
     return str.substring(from, to);
 });
 
-// params
-// TODO support building more than one crate at once and more than one version of a crate
-var inputFile = "input.json";
-// TODO add favicon url to config
-// TODO add logo url to config
-// TODO add main menu urls to config
-// TODO add projectTitle to config
-var projectTitle = 'libstd docs';
-var baseSourceUrl = 'https://github.com/mozilla/rust/blob/master/src/libstd/';
+function createTypeTreeNode(name, parent) {
+    parent = parent || null;
 
-var BUILD_TARGET = "build";
+    return {
+        // special metadata
+        name: name,
+        parent: parent,
+        submods: {},
 
-if (!fs.existsSync(BUILD_TARGET)) {
-    fs.mkdirSync(BUILD_TARGET);
+        // list of elements
+        mods: {},
+        structs: {},
+        enums: {},
+        traits: {},
+        typedefs: {},
+        fns: {},
+        reexports: {},
+    };
 }
 
-function shortType(type) {
+function shortenType(type) {
     return type.substring(0, type.length - 1);
 }
 
@@ -82,8 +96,8 @@ function extractDocs(elem) {
 function shortDescription(elem) {
     var match, docblock = extractDocs(elem);
 
-    match = docblock.match(/^([\s\S]+?)\r?\n[ \t\*]+\r?\n([\s\S]+)/);
-    return match ? match[1] : docblock;
+    match = docblock.match(/^([\s\S]+?)\r?\n[ \t\*]*\r?\n([\s\S]+)/);
+    return match ? match[1].replace(/\n/g, '<br/>') : docblock;
 }
 
 function getPath(tree) {
@@ -134,8 +148,8 @@ function render(template, vars, references, cb) {
     vars.long_description = function (elem) {
         var match, docblock = extractDocs(elem);
 
-        match = docblock.match(/^([\s\S]+?)\r?\n[ \t\*]+\r?\n([\s\S]+)/);
-        return match ? match[2] : '';
+        match = docblock.match(/^([\s\S]+?)\r?\n[ \t\*]*\r?\n([\s\S]+)/);
+        return match ? match[2].replace(/\n/g, '<br/>') : '';
     };
     vars.link_to_element = function (id, currentTree) {
         var modPrefix = '';
@@ -143,13 +157,13 @@ function render(template, vars, references, cb) {
             modPrefix = modPath(references[id].tree);
         }
 
-        return '<a class="' + shortType(references[id].type) + '" href="' + vars.url_to_element(id, currentTree) + '">' + modPrefix + references[id].def.name + '</a>';
+        return '<a class="' + shortenType(references[id].type) + '" href="' + vars.url_to_element(id, currentTree) + '">' + modPrefix + references[id].def.name + '</a>';
     };
     vars.url_to_element = function (id, currentTree) {
         if (references[id].type === 'mods') {
             return relativePath(currentTree, references[id].tree) + references[id].def.name + '/index.html';
         }
-        return relativePath(currentTree, references[id].tree) + shortType(references[id].type) + '.' + references[id].def.name + '.html';
+        return relativePath(currentTree, references[id].tree) + shortenType(references[id].type) + '.' + references[id].def.name + '.html';
     };
     vars.breadcrumb = function (typeTree, currentTree) {
         var path = [], out = '', tmpTree;
@@ -191,70 +205,104 @@ function render(template, vars, references, cb) {
             return a.name.localeCompare(b.name);
         });
     };
-    vars.short_type = function shortType(type, currentTree) {
+    vars.short_type = function shortType(type, currentTree, realType) {
         var types;
 
         if (!currentTree) {
             throw new Error('Missing currentTree arg #2');
         }
 
-        if (type.type === 'primitive') {
+        switch (realType || type.type) {
+        case 'primitive':
             return type.value;
-        }
-        if (type.type === 'resolved') {
-            if (!references[type.value]) {
-                return '&lt;ID:'+type.value+'&gt;'; // TODO fix this
-                throw new Error('Invalid resolved ref id: ' + type.value);
-            }
 
+        case 'resolved':
+            if (!references[type.value]) {
+                return '&lt;ID:' + type.value + '&gt;'; // TODO fix this
+                // throw new Error('Invalid resolved ref id: ' + type.value);
+            }
             return vars.link_to_element(type.value, currentTree);
-        }
-        if (type.type === 'tuple') {
+
+        case 'tuple':
             types = type.members === undefined ? type.value : type.members;
             types = types.map(function (t) {
-                return shortType(t, currentTree);
+                return shortType(t, currentTree, realType);
             }).join(', ');
-
             return '(' + types + ')';
-        }
-        if (type.type === 'managed') {
-            return '@' + shortType(type.value, currentTree);
-        }
-        if (type.type === 'unique') {
-            return '~' + shortType(type.value, currentTree);
-        }
-        if (type.type === 'vector') {
-            return '[' + shortType(type.value, currentTree) + ']';
-        }
-        if (type.type === 'string') {
+
+        case 'managed':
+            return '@' + shortType(type.value, currentTree, realType);
+        case 'unique':
+            return '~' + shortType(type.value, currentTree, realType);
+        case 'vector':
+            return '[' + shortType(type.value, currentTree, realType) + ']';
+        case 'string':
             return 'str';
-        }
-        if (type.type === 'bottom') {
+        case 'bottom':
             return '!';
-        }
-        if (type.type === 'closure') {
+        case 'closure':
             return '&lt;CLOSURE&gt;'; // TODO fix this once the json is correct
-        }
-        if (type.type === 'generic') {
+        case 'generic':
             return references[type.value].def.name;
-        }
-        if (type.type === 'unit') { // "nil" return value
+        case 'unit': // "nil" return value
             return '';
+        case 'barefn':
+            return (type.value.abi ? 'extern ' + type.value.abi + ' ' : '') + vars.render_fn(type.value, currentTree);
         }
 
-        throw new Error('Unknown type: ' + type.type + ' with value ' + JSON.stringify(type.value) + ', could not parse');
+        throw new Error('Can not render short type: ' + type.type + ' with value ' + JSON.stringify(type.value) + ' of type ' + (realType || type.type));
     };
-    vars.source_url = function (element) {
+    vars.render_fn = function (fn, currentTree) {
+        var output = 'fn' + (fn.name ? ' ' + fn.name : '') + vars.render_generics(fn) + '(';
+        output += fn.decl.arguments.map(function (arg) {
+            return (arg.name ? arg.name + ': ' : '') + vars.short_type(arg.type, currentTree);
+        }).join(', ');
+        output += ')';
+
+        if (fn.decl.output.type !== 'unit') {
+            output += ' -&gt; ' + vars.short_type(fn.decl.output, currentTree);
+        }
+
+        return output;
+    };
+    vars.render_generics = function (element) {
+        var typ, lt, output = '';
+
+        if (!element.generics) {
+            if (element.abi) {
+                return '';
+            }
+            throw new Error('Element has no generics defined ' + JSON.stringify(element));
+        }
+
+        typ = element.generics.typarams;
+        lt = element.generics.lifetimes;
+
+        if (typ.length || lt.length) {
+            output += '&lt;';
+            if (lt.length) {
+                output += "'" + lt.join(", '");
+            }
+            if (typ.length && lt.length) {
+                output += ', ';
+            }
+            output += typ.map(function (t) { return t.name; }).join(', ');
+            output += '&gt;';
+        }
+
+        return output;
+    };
+    vars.source_url = function (element, crate) {
         var matches;
         if (!element.source) {
             throw new Error('Element has no source: ' + JSON.stringify(element));
         }
-        matches = element.source.match(/^([a-z0-9_.\/-]+):(\d+):\d+:? (\d+):\d+$/i);
+        matches = element.source.match(/^([a-z0-9_.\/\-]+):(\d+):\d+:? (\d+):\d+$/i);
         if (!matches) {
             throw new Error('Could not parse element.source for ' + JSON.stringify(element));
         }
 
-        return baseSourceUrl + matches[1] + '#L' + matches[2] + '-' + matches[3];
+        return config.baseSourceUrls[crate.name].replace('%version%', crate.version) + matches[1] + '#L' + matches[2] + '-' + matches[3];
     };
 
     Twig.renderFile("templates/" + template, vars, function (dummy, out) { cb(out); });
@@ -284,30 +332,31 @@ function indexModule(path, module, typeTree, references, searchIndex) {
                 });
             }
             typeTree[type][def.id] = name;
-            searchIndex.push({type: shortType(type), name: name, path: getPath(typeTree).join('::'), desc: shortDescription(def)});
+            searchIndex.push({type: shortenType(type), name: name, path: getPath(typeTree).join('::'), desc: shortDescription(def)});
             references[def.id] = {type: type, def: def, tree: typeTree};
         });
     });
 }
 
-function dumpModule(path, module, typeTree, references, crates) {
+function dumpModule(path, module, typeTree, references, crate, crates) {
     var rootPath, matches,
-        buildPath = BUILD_TARGET + "/" + path.replace(/::/g, '/') + '/',
+        buildPath = config.outputDir + crate.version + "/" + path.replace(/::/g, '/') + '/',
         types = ['structs', 'enums', 'traits', 'typedefs', 'fns', 'reexports'];
 
     matches = path.match(/::/g);
-    rootPath = '../' + (matches ? new Array(matches.length + 1).join('../') : '');
+    rootPath = '../' + (matches ? new Array(matches.length + 2).join('../') : '');
 
     function renderTemplate(type, def, filename) {
         var data, cb;
         data = {
             path: path,
             type_tree: typeTree,
-            type: shortType(type),
+            type: shortenType(type),
             root_path: rootPath,
             element: def,
-            project_title: projectTitle,
+            project_title: config.title,
             crates: crates,
+            crate: crate,
         };
         if (!fs.existsSync(buildPath)) {
             fs.mkdirSync(buildPath);
@@ -323,7 +372,7 @@ function dumpModule(path, module, typeTree, references, crates) {
             return;
         }
         module[type].forEach(function (def) {
-            renderTemplate(type, def, shortType(type) + '.' + def.name  + ".html");
+            renderTemplate(type, def, shortenType(type) + '.' + def.name  + ".html");
         });
     });
 
@@ -331,64 +380,93 @@ function dumpModule(path, module, typeTree, references, crates) {
 
     if (module.mods) {
         module.mods.forEach(function (mod) {
-            dumpModule(path + '::' + mod.name, mod, typeTree.submods[mod.name], references);
+            dumpModule(path + '::' + mod.name, mod, typeTree.submods[mod.name], references, crate, crates);
         });
     }
 }
 
-function createTypeTreeNode(name, parent) {
-    parent = parent || null;
-
-    return {
-        // special metadata
-        name: name,
-        parent: parent,
-        submods: {},
-
-        // list of elements
-        mods: {},
-        structs: {},
-        enums: {},
-        traits: {},
-        typedefs: {},
-        fns: {},
-        reexports: {},
-    };
-}
-
-function renderMainIndex(crates) {
+function renderMainIndex(version) {
     var data, cb;
     data = {
         root_path: '',
-        project_title: projectTitle,
-        crates: crates,
+        project_title: config.title,
+        crates: version.crates,
     };
     cb = function (out) {
-        fs.writeFile(BUILD_TARGET + '/index.html', out);
+        fs.writeFile(config.outputDir + version.version + '/index.html', out);
     };
-    if (crates.length === 1) {
-        cb('<DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=' + crates[0] + '/index.html"></head><body></body></html>');
+    if (version.crates.length === 1) {
+        cb('<DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=' + version.crates[0].name + '/index.html"></head><body></body></html>');
     } else {
         render('crates.twig', data, {}, cb);
     }
 }
 
-var data = JSON.parse(fs.readFileSync(inputFile));
-if (data.schema !== '0.2.0') {
-    throw new Error('Unsupported schema ' + data.schema);
+function initCrate(crate, searchIndex) {
+    var data = JSON.parse(fs.readFileSync(crate.path));
+    if (data.schema !== '0.2.0') {
+        throw new Error('Unsupported schema ' + data.schema);
+    }
+    crate.name = data.name;
+    crate.data = data.mods[0];
+    crate.typeTree = createTypeTreeNode(crate.name);
+    crate.references = createTypeTreeNode(crate.name);
+    crate.data.name = crate.name;
+
+    indexModule(crate.name, crate.data, crate.typeTree, crate.references, searchIndex);
 }
 
-var crateName = data.name;
-var typeTree = createTypeTreeNode(crateName);
-var references = createTypeTreeNode(crateName);
-var crates = [crateName];
-var searchIndex = [];
+function dumpCrate(crate, crates) {
+    dumpModule(crate.name, crate.data, crate.typeTree, crate.references, crate, crates);
+}
 
-data.mods[0].name = crateName;
+(function main() {
+    var versions = [];
 
-indexModule(crateName, data.mods[0], typeTree, references, searchIndex);
-fs.writeFile(BUILD_TARGET + '/search-index.js', "searchIndex = " + JSON.stringify(searchIndex));
-searchIndex = null;
-dumpModule(crateName, data.mods[0], typeTree, references, crates);
+    if (!fs.existsSync(config.outputDir)) {
+        fs.mkdirSync(config.outputDir);
+    }
 
-renderMainIndex(crates);
+    globsync.glob(config.inputDir.replace(/\/*$/, '/') + '*').forEach(function (path) {
+        var crates = [],
+            version = path.replace(/.*?\/([^\/]+)\/$/, '$1');
+
+        globsync.glob(path + '*.json').forEach(function (path) {
+            var crate = path.replace(/.*?\/([^\/]+)\.json$/, '$1');
+            crates.push({path: path, version: version});
+        });
+        crates.sort(function (a, b) {
+            return a.name.localeCompare(b.name);
+        });
+
+        versions.push({
+            version: version,
+            crates: crates
+        });
+
+        if (!fs.existsSync(config.outputDir + version)) {
+            fs.mkdirSync(config.outputDir + version);
+        }
+    });
+
+    versions.sort(require('semver').rcompare);
+
+    versions.forEach(function (version) {
+        var searchIndex = [];
+
+        version.crates.forEach(function (crate) {
+            initCrate(crate, searchIndex);
+        });
+
+        fs.writeFile(config.outputDir + version.version + '/search-index.js', "searchIndex = " + JSON.stringify(searchIndex));
+        searchIndex = [];
+
+        version.crates.forEach(function (crate) {
+            dumpCrate(crate, version.crates);
+        });
+
+        renderMainIndex(version);
+    });
+
+    // TODO generate mod/elem.html files that redir to mod/type.elem.html (or show a "did you mean?" list of elems if a few of diff types have the same name)
+}());

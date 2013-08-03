@@ -47,7 +47,7 @@
                 <div class="block crate">
                     <h2>{{ 'crates'|trans }}</h2>
                     {% for crate in crates %}
-                        <a href="{{ root_path }}{{ crate }}/index.html">{{ crate }}</a><br />
+                        <a href="{{ root_path }}{{ crate.name }}/index.html">{{ crate.name }}</a><br />
                     {% endfor %}
                 </div>
             {% else %}
@@ -99,12 +99,12 @@
 
     {% block js %}
         <script>
-            var rootPath = {{ root_path|json_encode }}, searchIndex = null;
+            var rootPath = {{ (root_path ~ crate.version ~ '/')|json_encode }}, searchIndex = null;
         </script>
         <script src="{{ root_path }}js/lib/jquery-2.0.3.min.js"></script>
         <script src="{{ root_path }}js/lib/fullproof-20120919.min.js"></script>
         <script src="{{ root_path }}js/main.js"></script>
-        <script src="{{ root_path }}search-index.js"></script>
+        <script src="{{ root_path }}{{ crate.version }}/search-index.js"></script>
     {% endblock %}
 
     <div id="help" class="hidden">

@@ -7,6 +7,6 @@
     <h1>{{ project_title }}</h1>
     <h2>Crates</h2>
     {% for crate in crates %}
-        <a href="{{ crate }}/index.html">{{ crate }}</a><br />
+        <a href="{{ crate.name }}/index.html">{{ crate.name }}</a><br />
     {% endfor %}
 {% endblock %}

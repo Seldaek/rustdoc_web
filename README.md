@@ -7,7 +7,9 @@ Usage
 - clone the repo
 - if you don't have npm/node set up, install that first
 - if you don't have grunt run `npm install -g grunt-cli` to get it set up
-- run `npm install` and then `grunt` to build the input.json file
+- run `npm install`
+- place rustdoc_ng output files in input/<version>/<crate>.json where version must match tags on your git repo
+- run `grunt` to build the input files into a build/ dir
 
 Offline Docs
 ------------

@@ -1,6 +1,15 @@
 /*jslint browser: true, es5: true */
 /*globals $: true, searchIndex: true, fullproof: true, rootPath: true */
 
+/*
+ * This file is part of the rustdoc_web package.
+ *
+ * (c) Jordi Boggiano <j.boggiano@seld.be>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
 (function () {
     "use strict";
     var interval, searchEngine = new fullproof.ScoringEngine([new fullproof.StoreDescriptor("memorystore", fullproof.store.MemoryStore)]);
