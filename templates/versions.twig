@@ -1,0 +1,12 @@
+{% extends 'layout.twig' %}
+
+{% block sidebar %}{% endblock %}
+{% block title %}{{ config.title }}{% endblock %}
+
+{% block content %}
+    <h1>{{ config.title }}</h1>
+    <h2>Versions</h2>
+    {% for version in versions %}
+        <a href="{{ version.version }}/index.html">{{ version.version }}</a>{% if version.prerelease %} (snapshot){% endif %}<br />
+    {% endfor %}
+{% endblock %}
