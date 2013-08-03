@@ -9,7 +9,7 @@
             {% else %}
                 {{ breadcrumb(type_tree)|replace({"&#8203;": ""})|striptags|substring(0, -2) }}{{ type == 'mod' ? '' : '::' ~ element.name }}
             {% endif %}
-            {% if project_title is not empty %} - {{ project_title }}{% endif %}
+            {% if config.title is not empty %} - {{ config.title }}{% endif %}
         {% endblock %}
     </title>
 
@@ -19,6 +19,9 @@
     {% block css %}
         <link rel="stylesheet" type="text/css" href="{{ root_path }}main.css">
     {% endblock %}
+    {% if config.faviconUrl is not empty %}
+        <link rel="icon" href="{{ config.faviconUrl }}" sizes="16x16" type="image/vnd.microsoft.icon" />
+    {% endif %}
 
     {# TODO
     <link rel="canonical" href="{{ path_to_current_version_page }}" />
@@ -30,7 +33,9 @@
     <![endif]-->
 
     <section class="sidebar">
-        <img src="http://www.rust-lang.org/logos/rust-logo-128x128-blk.png" />
+        {% if config.logoUrl != false %}
+            <img src="{{ config.logoUrl }}" />
+        {% endif %}
 
         {% block sidebar %}
             <p class="location">
@@ -67,13 +72,10 @@
 
     <nav class="main">
     {% block nav %}
-        <a href="http://doc.rust-lang.org/doc/tutorial.html">Tutorial</a>
-        <span class="separator"></span>
-        <a href="http://static.rust-lang.org/doc/rust.html">Manual</a>
-        <span class="separator"></span>
-        <a class="current" href="{{ root_path }}">Documentation</a>
-        <span class="separator"></span>
-        <a href="https://github.com/mozilla/rust/wiki/Doc-releases">Releases</a>
+        {% for entry in config.menu %}
+            <a href="{{ entry.url|replace({'%rootPath%': root_path ~ 'index.html'}) }}">{{ entry.name }}</a>
+            {% if not loop.last %}<span class="separator"></span>{% endif %}
+        {% endfor %}
     {% endblock %}
     </nav>
 

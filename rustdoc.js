@@ -344,7 +344,7 @@ function dumpModule(path, module, typeTree, references, crate, crates) {
         types = ['structs', 'enums', 'traits', 'typedefs', 'fns', 'reexports'];
 
     matches = path.match(/::/g);
-    rootPath = '../' + (matches ? new Array(matches.length + 2).join('../') : '');
+    rootPath = '../../' + (matches ? new Array(matches.length + 1).join('../') : '');
 
     function renderTemplate(type, def, filename) {
         var data, cb;
@@ -354,9 +354,9 @@ function dumpModule(path, module, typeTree, references, crate, crates) {
             type: shortenType(type),
             root_path: rootPath,
             element: def,
-            project_title: config.title,
             crates: crates,
             crate: crate,
+            config: config,
         };
         if (!fs.existsSync(buildPath)) {
             fs.mkdirSync(buildPath);
@@ -385,18 +385,35 @@ function dumpModule(path, module, typeTree, references, crate, crates) {
     }
 }
 
-function renderMainIndex(version) {
+function renderMainVersionIndex(version) {
     var data, cb;
     data = {
-        root_path: '',
-        project_title: config.title,
+        root_path: '../',
         crates: version.crates,
+        config: config,
     };
     cb = function (out) {
         fs.writeFile(config.outputDir + version.version + '/index.html', out);
     };
     if (version.crates.length === 1) {
         cb('<DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=' + version.crates[0].name + '/index.html"></head><body></body></html>');
+    } else {
+        render('crates.twig', data, {}, cb);
+    }
+}
+
+function renderMainIndex(versions) {
+    var data, cb;
+    data = {
+        root_path: '',
+        versions: versions,
+        config: config,
+    };
+    cb = function (out) {
+        fs.writeFile(config.outputDir + '/index.html', out);
+    };
+    if (versions.length === 1) {
+        cb('<DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=' + versions[0].version + '/index.html"></head><body></body></html>');
     } else {
         render('crates.twig', data, {}, cb);
     }
@@ -441,7 +458,8 @@ function dumpCrate(crate, crates) {
 
         versions.push({
             version: version,
-            crates: crates
+            crates: crates,
+            prerelease: !!require('semver').valid(version),
         });
 
         if (!fs.existsSync(config.outputDir + version)) {
@@ -449,7 +467,21 @@ function dumpCrate(crate, crates) {
         }
     });
 
-    versions.sort(require('semver').rcompare);
+    versions.sort(function (a, b) {
+        if (!a.prerelease && !b.prerelease) {
+            return require('semver').rcompare(a.version, b.version);
+        }
+
+        if (a.prerelease && !b.prerelease) {
+            return 1;
+        }
+
+        if (b.prerelease) {
+            return -1;
+        }
+
+        return 0;
+    });
 
     versions.forEach(function (version) {
         var searchIndex = [];
@@ -465,8 +497,9 @@ function dumpCrate(crate, crates) {
             dumpCrate(crate, version.crates);
         });
 
-        renderMainIndex(version);
+        renderMainVersionIndex(version);
     });
+    renderMainIndex(versions);
 
     // TODO generate mod/elem.html files that redir to mod/type.elem.html (or show a "did you mean?" list of elems if a few of diff types have the same name)
 }());

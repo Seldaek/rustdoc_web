@@ -5,11 +5,14 @@
     "faviconUrl": "http://www.rust-lang.org/favicon.ico",
     "logoUrl": "http://www.rust-lang.org/logos/rust-logo-128x128-blk.png",
     "menu": [
-        {"name": "Documentation", "url": "%rootPath%"}
+        {"name": "Tutorial", "url": "http://doc.rust-lang.org/doc/tutorial.html"},
+        {"name": "Manual", "url": "http://static.rust-lang.org/doc/rust.html"},
+        {"name": "Documentation", "url": "%rootPath%"},
+        {"name": "Releases", "url": "https://github.com/mozilla/rust/wiki/Doc-releases"}
     ],
     "baseSourceUrls": {
         "std": "https://github.com/mozilla/rust/blob/%version%/src/libstd/",
         "extra": "https://github.com/mozilla/rust/blob/%version%/src/libextra/"
     },
-    "rustVersion": "0.7"
+    "rustVersion": "0.8"
 }
