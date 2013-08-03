@@ -259,15 +259,21 @@ function render(template, vars, references, cb) {
             output += 'once ';
         }
 
-        output += 'fn' + (fn.name ? ' ' + fn.name : '') + vars.render_generics(fn, fnType) + '(';
+        output += 'fn' + (fn.name ? ' ' + fn.name : '') + vars.render_generics(fn, fnType) + '(\n    ';
         output += fn.decl.arguments.map(function (arg) {
             return (arg.name ? arg.name + ': ' : '') + vars.short_type(arg.type, currentTree);
-        }).join(', ');
-        output += ')';
+        }).join(', \n    ');
+        output += '\n)';
 
         if (fn.decl.output.type !== 'unit') {
             output += ' -&gt; ' + vars.short_type(fn.decl.output, currentTree);
         }
+
+        Twig.extend(function (Twig) {
+            if (Twig.lib.strip_tags(output).replace(/&(gt|lt)/g, '').length < 100 || fnType !== 'fn') {
+                output = output.replace(/\n {4}|\n/g, '');
+            }
+        });
 
         return output;
     };
