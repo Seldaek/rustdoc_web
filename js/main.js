@@ -162,9 +162,9 @@
                     output += '<tr class="' + type + ' result"><td>';
 
                     if (type === 'mod') {
-                        output += item.path + '::<a href="' + rootPath + item.path.replace(/::/g, '/') + '/' + name + '/index.html" class="type ' + type + '">' + name + '</a>';
+                        output += item.path + '::<a href="' + rootPath + item.path.replace(/::/g, '/') + '/' + name + '/index.html" class="' + type + '">' + name + '</a>';
                     } else {
-                        output += item.path + '::<a href="' + rootPath + item.path.replace(/::/g, '/') + '/' + type + '.' + name + '.html" class="type ' + type + '">' + name + '</a>';
+                        output += item.path + '::<a href="' + rootPath + item.path.replace(/::/g, '/') + '/' + type + '.' + name + '.html" class="' + type + '">' + name + '</a>';
                     }
 
                     output += '</td><td><span class="desc">' + item.desc + '</span></td></tr>';

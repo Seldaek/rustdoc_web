@@ -52,7 +52,7 @@
                 <div class="block crate">
                     <h2>{{ 'crates'|trans }}</h2>
                     {% for crate in crates %}
-                        <a href="{{ root_path }}{{ crate.name }}/index.html">{{ crate.name }}</a><br />
+                        <a href="{{ root_path }}{{ crate.version }}/{{ crate.name }}/index.html" class="crate {% if crate.name == element.name %} current{% endif %}">{{ crate.name }}</a><br />
                     {% endfor %}
                 </div>
             {% else %}
