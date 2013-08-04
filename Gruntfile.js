@@ -50,4 +50,5 @@ module.exports = function (grunt) {
 
     grunt.registerTask('default', ['exec', 'sass', 'copy']);
     grunt.registerTask('browse', ['connect']);
+    grunt.registerTask('server', ['connect']);
 };

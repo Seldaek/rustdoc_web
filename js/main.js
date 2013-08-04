@@ -37,6 +37,25 @@
         }
     });
 
+    $('.version-selector').on('change', function () {
+        var i, match,
+            url = document.location.href,
+            stripped = '',
+            len = rootPath.match(/\.\.\//g).length + 1;
+
+        for (i = 0; i < len; i += 1) {
+            match = url.match(/\/[^\/]*$/);
+            if (i < len - 1) {
+                stripped = match[0] + stripped;
+            }
+            url = url.substring(0, url.length - match[0].length);
+        }
+
+        url += '/' + $('.version-selector').val() + stripped;
+
+        document.location.href = url;
+    });
+
     function initSearch(data) {
         var currentResults;
 
