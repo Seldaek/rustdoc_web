@@ -64,7 +64,7 @@
 
             matches = query.match(/^(fn|mod|str(uct)?|enum|trait|t(ype)?d(ef)?)\s*:\s*/i);
             if (matches) {
-                type = matches[1].replace('td', 'typedef').replace('str', 'struct').replace('tdef', 'typedef').replace('typed', 'typedef');
+                type = matches[1].replace(/^td$/, 'typedef').replace(/^str$/, 'struct').replace(/^tdef$/, 'typedef').replace(/^typed$/, 'typedef');
                 query = query.substring(matches[0].length);
             }
 
@@ -145,11 +145,11 @@
                     if (entry instanceof fullproof.ScoredElement) {
                         entry = entry.value;
                     }
-                    if (shown[entry]) {
+                    if (shown.indexOf(entry) !== -1 || shown.length >= 100) {
                         return;
                     }
 
-                    shown[entry] = true;
+                    shown.push(entry);
                     item = data[entry];
                     name = item.name;
                     type = item.type;
@@ -191,7 +191,7 @@
             searchEngine.lookup(query.query, showResults);
         }
 
-        function engineReady(state) {
+        function engineReady() {
             var keyUpTimeout;
             $('.do-search').on('click', search);
             $('.search-input').on('keyup', function () {
