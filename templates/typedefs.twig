@@ -5,7 +5,3 @@
     {# TODO fix the short_type call should be the exact typedef definition #}
     <pre>type {{ element.name }}{{ render_generics(element) }} = {{ short_type(element.type, type_tree) }};</pre>
 {% endblock %}
-
-{% block source %}
-    {# TODO remove once type defs have a source #}
-{% endblock %}

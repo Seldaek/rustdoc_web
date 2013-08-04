@@ -1,20 +1,33 @@
 {% extends 'element.twig' %}
 
 {% block name %}
-    <h1>{% if type_tree.parent %}{{ breadcrumb(type_tree.parent, type_tree) }}{% endif %}<a class="{{ type }}" href="">{{ element.name }}</a></h1>
+    <h1 class="fqn">{% if type_tree.parent %}{{ breadcrumb(type_tree.parent, type_tree) }}{% endif %}<a class="{{ type }}" href="">{{ element.name }}</a></h1>
 {% endblock %}
 
-{% block extra %}
-    {% for type in ['mod', 'struct', 'enum', 'trait', 'typedef', 'fn', 'reexport'] %}
+{% block definition %}
+    {% for type in ['reexport', 'mod', 'struct', 'enum', 'static', 'trait', 'fn', 'typedef'] %}
         {% if type_tree[type ~ 's'] is not empty %}
             <h2>{{ (type ~ 's')|trans }}</h2>
-            {% for item in sort(type_tree[type ~ 's']) %}
-                {{ link_to_element(item.id, type_tree) }}<br />
-            {% endfor %}
+            {% if type == 'static' %}
+                <table>
+                    {% for item in sort(type_tree[type ~ 's']) %}
+                        {% set elem = element_by_id(item.id) %}
+                        <tr>
+                            <td><code>{{ elem.def.name }}: {{ short_type(elem.def.type, elem.tree) }} = {{ elem.def.expr }}</code></td>
+                            <td>{{ extract_docs(elem.def) }}</td> {# TODO markdown #}
+                        </tr>
+                    {% endfor %}
+                </table>
+            {% else %}
+                <ul class="item-list{% if count(type_tree[type ~ 's']) > 25 %} multi-column{% endif %}">
+                    {{ type_tree[type ~ 's'].length }}
+                    {% for item in sort(type_tree[type ~ 's']) %}
+                        <li>{{ link_to_element(item.id, type_tree) }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
         {% endif %}
     {% endfor %}
 {% endblock %}
 
 {% block source %}{% endblock %}
-
-{% block documentation %}{% endblock %}

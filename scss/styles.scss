@@ -96,6 +96,28 @@
            padding-right: $contentPadding;
         }
     }
+
+    .item-list {
+        list-style-type: none;
+        padding: 0;
+
+        li {
+            margin-bottom: 3px;
+        }
+
+        &.multi-column {
+            -moz-column-count: 5;
+            -moz-column-gap: 2.5em;
+            -webkit-column-count: 5;
+            -webkit-column-gap: 2.5em;
+            column-count: 5;
+            column-gap: 2.5em;
+            li {
+                width: 100%;
+                display: inline-block;
+            }
+        }
+    }
 }
 
 nav {
@@ -153,6 +175,11 @@ a {
     }
 }
 
+.search-input {
+    border: 2px solid #f2f2f2;
+    @include border-radius(2px);
+    width: 350px;
+}
 .search-results {
     .desc {
         white-space: nowrap;

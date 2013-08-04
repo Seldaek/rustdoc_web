@@ -6,7 +6,9 @@
 {% block content %}
     <h1>{{ config.title }}</h1>
     <h2>Crates</h2>
-    {% for crate in crates %}
-        <a href="{{ crate.name }}/index.html">{{ crate.name }}</a><br />
-    {% endfor %}
+    <ul class="item-list">
+        {% for crate in crates %}
+            <li><a href="{{ crate.name }}/index.html">{{ crate.name }}</a></li>
+        {% endfor %}
+    </ul>
 {% endblock %}

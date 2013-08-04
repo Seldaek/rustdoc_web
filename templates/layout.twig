@@ -14,7 +14,7 @@
     </title>
 
     {% block font %}
-        <link href='http://fonts.googleapis.com/css?family=Oswald:700' rel='stylesheet' type='text/css'>
+        <link href='http://fonts.googleapis.com/css?family=Oswald:700|Inconsolata:400' rel='stylesheet' type='text/css'>
     {% endblock %}
     {% block css %}
         <link rel="stylesheet" type="text/css" href="{{ root_path }}main.css">
@@ -79,18 +79,21 @@
     {% endblock %}
     </nav>
 
-    <nav class="sub">
     {% block subnav %}
+    <nav class="sub">
         <form class="search-form js-only">
             <input class="search-input" name="search" />
             <button class="do-search">Search</button>
         </form>
-        <select class="version-selector js-only">
-            <option value="master">master</option>
-            <option value="0.7">0.7</option>
-        </select>
-    {% endblock %}
+        {% if versions.length > 1 %}
+            <select class="version-selector js-only">
+                {% for version in versions %}
+                    <option {% if cur_version == version.version %}selected {% endif %}value="{{ version.version }}">{{ version.version }}</option>
+                {% endfor %}
+            </select>
+        {% endif %}
     </nav>
+    {% endblock %}
 
     <section class="content {{ type }}">
     {% block content %}

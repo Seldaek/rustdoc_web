@@ -12,8 +12,12 @@ h2, h3, h4 {
     text-transform: uppercase;
 }
 
-code, pre {
+code, pre, h1.fqn {
     font: $codeFont;
+}
+h1.fqn {
+    font-size: 26px;
+    font-weight: normal;
 }
 
 nav {

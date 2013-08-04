@@ -29,6 +29,7 @@ var transTexts = {
     'enums': 'Enums',
     'traits': 'Traits',
     'typedefs': 'Type Definitions',
+    'statics': 'Statics',
     'fns': 'Functions',
     'reexports': 'Re-exports',
     'crates': 'Crates',
@@ -37,6 +38,7 @@ var transTexts = {
     'enum': 'Enum',
     'trait': 'Trait',
     'typedef': 'Type Definition',
+    'static': 'Static',
     'fn': 'Function',
     'reexport': 'Re-export',
 };
@@ -75,6 +77,7 @@ function createTypeTreeNode(name, parent) {
         typedefs: {},
         fns: {},
         reexports: {},
+        statics: {},
     };
 }
 
@@ -82,15 +85,19 @@ function shortenType(type) {
     return type.substring(0, type.length - 1);
 }
 
-function extractDocs(elem) {
-    var docs = '';
-    elem.attrs.forEach(function (attr) {
-        if (attr.doc) {
-            docs = attr.doc.toString();
+function extract(data, key) {
+    var res = '';
+    data.forEach(function (attr) {
+        if (attr.hasOwnProperty(key)) {
+            res = attr[key];
         }
     });
 
-    return docs;
+    return res;
+}
+
+function extractDocs(elem) {
+    return extract(elem.attrs, 'doc').toString();
 }
 
 function shortDescription(elem) {
@@ -159,6 +166,31 @@ function render(template, vars, references, cb) {
 
         return '<a class="' + shortenType(references[id].type) + '" href="' + vars.url_to_element(id, currentTree) + '">' + modPrefix + references[id].def.name + '</a>';
     };
+    vars.link_to_external = function (name, version, knownCrates) {
+        var crate, path, match;
+        match = name.match(/^([^:]+)(::.*)?$/);
+        crate = match[1];
+        path = name.replace(/::/g, '/') + '.html';
+
+
+        return name;
+
+        foundElems = version.crates.find(name);
+        if (foundElems.length == 1) {
+            // TODO exact link to that element in that crate
+        }
+
+        if (knownCrates[crate] === undefined) {
+            return name;
+        }
+
+        // TODO fuzzy link according to knownCrates, but this will require the redirecting pages to be created unless we can have a type here
+
+        return '<a class="' + shortenType(references[id].type) + '" href="' + vars.url_to_element(id, currentTree) + '">' + modPrefix + references[id].def.name + '</a>';
+    };
+    vars.element_by_id = function (id) {
+        return references[id];
+    };
     vars.url_to_element = function (id, currentTree) {
         if (references[id].type === 'mods') {
             return relativePath(currentTree, references[id].tree) + references[id].def.name + '/index.html';
@@ -205,6 +237,18 @@ function render(template, vars, references, cb) {
             return a.name.localeCompare(b.name);
         });
     };
+    vars.count = function (data) {
+        var key, count = 0;
+        if (data instanceof Array) {
+            return data.length;
+        }
+
+        for (key in data) {
+            count += 1;
+        }
+
+        return count;
+    };
     vars.short_type = function shortType(type, currentTree, realType) {
         var types;
 
@@ -218,10 +262,14 @@ function render(template, vars, references, cb) {
 
         case 'resolved':
             if (!references[type.value]) {
+                console.log('INVALID RESOLVED REFERENCE ID ' + type.value);
                 return '&lt;ID:' + type.value + '&gt;'; // TODO fix this
                 // throw new Error('Invalid resolved ref id: ' + type.value);
             }
             return vars.link_to_element(type.value, currentTree);
+
+        case 'external':
+            return vars.link_to_external(type.value, config.knownCrates);
 
         case 'tuple':
             types = type.members === undefined ? type.value : type.members;
@@ -321,7 +369,7 @@ function render(template, vars, references, cb) {
 }
 
 function indexModule(path, module, typeTree, references, searchIndex) {
-    var types = ['mods', 'structs', 'enums', 'traits', 'typedefs', 'fns', 'reexports'];
+    var types = ['mods', 'structs', 'enums', 'traits', 'typedefs', 'fns', 'reexports', 'statics'];
 
     types.forEach(function (type) {
         if (!module[type]) {
@@ -333,6 +381,8 @@ function indexModule(path, module, typeTree, references, searchIndex) {
                 def.id = path + name;
                 typeTree.submods[name] = createTypeTreeNode(name, typeTree);
                 indexModule(path + '::' + name, def, typeTree.submods[name], references, searchIndex);
+            } else if (type === 'statics') {
+                def.id = path + name;
             } else {
                 if (def.id === undefined) {
                     throw new Error('Missing id on ' + JSON.stringify(def));
@@ -350,10 +400,10 @@ function indexModule(path, module, typeTree, references, searchIndex) {
     });
 }
 
-function dumpModule(path, module, typeTree, references, crate, crates) {
+function dumpModule(path, module, typeTree, references, crate, crates, versions) {
     var rootPath, matches,
         buildPath = config.outputDir + crate.version + "/" + path.replace(/::/g, '/') + '/',
-        types = ['structs', 'enums', 'traits', 'typedefs', 'fns', 'reexports'];
+        types = ['structs', 'enums', 'traits', 'typedefs', 'fns'];
 
     matches = path.match(/::/g);
     rootPath = '../../' + (matches ? new Array(matches.length + 1).join('../') : '');
@@ -368,6 +418,8 @@ function dumpModule(path, module, typeTree, references, crate, crates) {
             element: def,
             crates: crates,
             crate: crate,
+            versions: versions,
+            cur_version: crate.version,
             config: config,
         };
         if (!fs.existsSync(buildPath)) {
@@ -392,21 +444,26 @@ function dumpModule(path, module, typeTree, references, crate, crates) {
 
     if (module.mods) {
         module.mods.forEach(function (mod) {
-            dumpModule(path + '::' + mod.name, mod, typeTree.submods[mod.name], references, crate, crates);
+            dumpModule(path + '::' + mod.name, mod, typeTree.submods[mod.name], references, crate, crates, versions);
         });
     }
 }
 
-function renderMainVersionIndex(version) {
+function renderCratesIndex(version, versions) {
     var data, cb;
     data = {
         root_path: '../',
         crates: version.crates,
         config: config,
+        versions: versions,
+        cur_version: version.version,
+        // dummy object because we are not in a crate but the layout needs one
+        crate: {version: version.version}
     };
     cb = function (out) {
         fs.writeFile(config.outputDir + version.version + '/index.html', out);
     };
+
     if (version.crates.length === 1) {
         cb('<DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=' + version.crates[0].name + '/index.html"></head><body></body></html>');
     } else {
@@ -414,7 +471,7 @@ function renderMainVersionIndex(version) {
     }
 }
 
-function renderMainIndex(versions) {
+function renderVersionsIndex(versions) {
     var data, cb;
     data = {
         root_path: '',
@@ -427,26 +484,38 @@ function renderMainIndex(versions) {
     if (versions.length === 1) {
         cb('<DOCTYPE html><html><head><meta http-equiv="refresh" content="0; url=' + versions[0].version + '/index.html"></head><body></body></html>');
     } else {
-        render('crates.twig', data, {}, cb);
+        render('versions.twig', data, {}, cb);
     }
 }
 
 function initCrate(crate, searchIndex) {
-    var data = JSON.parse(fs.readFileSync(crate.path));
-    if (data.schema !== '0.2.0') {
+    var sourceUrl, data = JSON.parse(fs.readFileSync(crate.path));
+    if (data.schema !== '0.3.0') {
         throw new Error('Unsupported schema ' + data.schema);
     }
+
     crate.name = data.name;
     crate.data = data.mods[0];
     crate.typeTree = createTypeTreeNode(crate.name);
     crate.references = createTypeTreeNode(crate.name);
     crate.data.name = crate.name;
+    crate.data.attrs = data.attrs;
+    crate.license = extract(data.attrs, 'license').toString();
+
+    // read the link.url of the crate and take that as default if the config has no url configured
+    sourceUrl = extract(data.attrs, 'link');
+    if (sourceUrl !== '' && config.baseSourceUrls[crate.name] === undefined) {
+        sourceUrl = extract(sourceUrl, 'url').toString();
+        if (sourceUrl !== '') {
+            config.baseSourceUrls[crate.name] = sourceUrl.replace(/\/*$/, '/');
+        }
+    }
 
     indexModule(crate.name, crate.data, crate.typeTree, crate.references, searchIndex);
 }
 
-function dumpCrate(crate, crates) {
-    dumpModule(crate.name, crate.data, crate.typeTree, crate.references, crate, crates);
+function dumpCrate(crate, crates, versions) {
+    dumpModule(crate.name, crate.data, crate.typeTree, crate.references, crate, crates, versions);
 }
 
 (function main() {
@@ -463,9 +532,6 @@ function dumpCrate(crate, crates) {
         globsync.glob(path + '*.json').forEach(function (path) {
             var crate = path.replace(/.*?\/([^\/]+)\.json$/, '$1');
             crates.push({path: path, version: version});
-        });
-        crates.sort(function (a, b) {
-            return a.name.localeCompare(b.name);
         });
 
         versions.push({
@@ -502,16 +568,20 @@ function dumpCrate(crate, crates) {
             initCrate(crate, searchIndex);
         });
 
+        version.crates.sort(function (a, b) {
+            return a.name.localeCompare(b.name);
+        });
+
         fs.writeFile(config.outputDir + version.version + '/search-index.js', "searchIndex = " + JSON.stringify(searchIndex));
         searchIndex = [];
 
         version.crates.forEach(function (crate) {
-            dumpCrate(crate, version.crates);
+            dumpCrate(crate, version.crates, versions);
         });
 
-        renderMainVersionIndex(version);
+        renderCratesIndex(version, versions);
     });
-    renderMainIndex(versions);
+    renderVersionsIndex(versions);
 
     // TODO generate mod/elem.html files that redir to mod/type.elem.html (or show a "did you mean?" list of elems if a few of diff types have the same name)
 }());
