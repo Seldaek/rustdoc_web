@@ -289,15 +289,24 @@ function render(template, vars, references, cb) {
             return '@' + shortType(type.value, currentTree, realType);
         case 'unique':
             return '~' + shortType(type.value, currentTree, realType);
+        case 'borrowed':
+            return '&' + shortType(type.value, currentTree, realType);
+        case 'unsafe_pointer':
+            return '*' + shortType(type.value, currentTree, realType);
         case 'vector':
             return '[' + shortType(type.value, currentTree, realType) + ']';
         case 'string':
             return 'str';
         case 'bottom':
             return '!';
+        case 'self':
+            return 'Self';
         case 'closure':
             return vars.render_fn(type.value, currentTree, 'closure');
         case 'generic':
+            if (references[type.value] === undefined) {
+                throw new Error('Invalid generic reference id in ' + JSON.stringify(type));
+            }
             return references[type.value].def.name;
         case 'unit': // "nil" return value
             return '';
@@ -335,15 +344,15 @@ function render(template, vars, references, cb) {
     vars.render_generics = function (element, fnType) {
         var typ, lt, output = '';
 
-        if (fnType === 'barefn' || fnType === 'closure') {
+        if (fnType === 'closure') {
             element.generics = {typarams: [], lifetimes: element.lifetimes};
         }
-        if (!element.generics || element.generics.typarams === undefined || element.generics.lifetimes === undefined) {
+        if (!element.generics) {
             throw new Error('Element has invalid generics defined ' + JSON.stringify(element));
         }
 
-        typ = element.generics.typarams;
-        lt = element.generics.lifetimes;
+        typ = element.generics.typarams || [];
+        lt = element.generics.lifetimes || [];
 
         if (typ.length || lt.length) {
             output += '&lt;';
@@ -378,6 +387,29 @@ function render(template, vars, references, cb) {
 function indexModule(path, module, typeTree, references, searchIndex) {
     var types = ['mods', 'structs', 'enums', 'traits', 'typedefs', 'fns', 'reexports', 'statics'];
 
+    function indexTyparams(typarams) {
+        typarams.forEach(function (typaram) {
+            references[typaram.id] = {type: 'typaram', def: typaram, tree: typeTree};
+        });
+    }
+
+    function indexMethods(methods, parentName, parentType) {
+        methods.forEach(function (method) {
+            if (method.generics && method.generics.typarams) {
+                indexTyparams(method.generics.typarams);
+            }
+            searchIndex.push({type: 'method', name: method.name, parent: parentName, parentType: parentType, desc: shortDescription(method), path: getPath(typeTree).join('::')});
+        });
+    }
+
+    // TODO index impls methods?
+
+    function indexVariants(variants, parentName, parentType) {
+        variants.forEach(function (variant) {
+            searchIndex.push({type: 'variant', name: variant.name, parent: parentName, parentType: parentType, desc: '', path: getPath(typeTree).join('::')});
+        });
+    }
+
     types.forEach(function (type) {
         if (!module[type]) {
             return;
@@ -396,9 +428,16 @@ function indexModule(path, module, typeTree, references, searchIndex) {
                 }
             }
             if (def.generics && def.generics.typarams) {
-                def.generics.typarams.forEach(function (typaram) {
-                    references[typaram.id] = {type: 'typaram', def: typaram, tree: typeTree};
-                });
+                indexTyparams(def.generics.typarams);
+            }
+            if (def.required_methods) {
+                indexMethods(def.required_methods, name, shortenType(type));
+            }
+            if (def.default_methods) {
+                indexMethods(def.default_methods, name, shortenType(type));
+            }
+            if (def.variants) {
+                indexVariants(def.variants, name, shortenType(type));
             }
             typeTree[type][def.id] = name;
             searchIndex.push({type: shortenType(type), name: name, path: getPath(typeTree).join('::'), desc: shortDescription(def)});
@@ -497,14 +536,14 @@ function renderVersionsIndex(versions) {
 
 function initCrate(crate, searchIndex) {
     var sourceUrl, data = JSON.parse(fs.readFileSync(crate.path));
-    if (data.schema !== '0.3.0') {
+    if (data.schema !== '0.5.0') {
         throw new Error('Unsupported schema ' + data.schema);
     }
 
     crate.name = data.name;
     crate.data = data.mods[0];
     crate.typeTree = createTypeTreeNode(crate.name);
-    crate.references = createTypeTreeNode(crate.name);
+    crate.references = {};
     crate.data.name = crate.name;
     crate.data.attrs = data.attrs;
     crate.license = extract(data.attrs, 'license').toString();

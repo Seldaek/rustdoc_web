@@ -11,8 +11,8 @@ struct {{ element.name }} {
 {% endfor %}
 }
 </pre>
-{% elseif element.type == 'Tuple' %}
-    <pre class="{{ type }}">struct {{ element.name }}({% for field in element.fields %}{{ short_type(field.type, type_tree) }}{% if not loop.last %}, {% endif %}{% endfor %})</pre>
+{% elseif element.type == 'Tuple' or element.type == 'Newtype' %}
+    <pre class="{{ type }}">struct {{ element.name }}({% for field in element.fields %}{{ short_type(field.type, type_tree) }}{% if not loop.last %}, {% endif %}{% endfor %});</pre>
 {% elseif element.type == 'Unit' %}
     <pre class="{{ type }}">struct {{ element.name }};</pre>
 {% else %}
