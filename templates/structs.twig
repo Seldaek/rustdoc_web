@@ -5,16 +5,16 @@
 
 {% if element.type == 'Plain' %}
 <pre class="{{ type }}">
-struct {{ element.name }} {
+struct {{ element.name }}{{ render_generics(element) }} {
 {% for field in element.fields %}
     {{ field.name }}: {{ short_type(field.type, type_tree) }};
 {% endfor %}
 }
 </pre>
 {% elseif element.type == 'Tuple' or element.type == 'Newtype' %}
-    <pre class="{{ type }}">struct {{ element.name }}({% for field in element.fields %}{{ short_type(field.type, type_tree) }}{% if not loop.last %}, {% endif %}{% endfor %});</pre>
+    <pre class="{{ type }}">struct {{ element.name }}{{ render_generics(element) }}({% for field in element.fields %}{{ short_type(field.type, type_tree) }}{% if not loop.last %}, {% endif %}{% endfor %});</pre>
 {% elseif element.type == 'Unit' %}
-    <pre class="{{ type }}">struct {{ element.name }};</pre>
+    <pre class="{{ type }}">struct {{ element.name }}{{ render_generics(element) }};</pre>
 {% else %}
     <pre class="{{ type }}">Unkwown struct type: {{ element.type }}</pre>
 {% endif %}
