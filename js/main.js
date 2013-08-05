@@ -163,6 +163,10 @@
 
                     if (type === 'mod') {
                         output += item.path + '::<a href="' + rootPath + item.path.replace(/::/g, '/') + '/' + name + '/index.html" class="' + type + '">' + name + '</a>';
+                    } else if (type === 'static' || type === 'reexport') {
+                        output += item.path + '::<a href="' + rootPath + item.path.replace(/::/g, '/') + '/index.html" class="' + type + '">' + name + '</a>';
+                    } else if (item.parent !== undefined) {
+                        output += item.path + '::' + item.parent + '::<a href="' + rootPath + item.path.replace(/::/g, '/') + '/' + item.parentType + '.' + item.parent + '.html" class="' + type + '">' + name + '</a>';
                     } else {
                         output += item.path + '::<a href="' + rootPath + item.path.replace(/::/g, '/') + '/' + type + '.' + name + '.html" class="' + type + '">' + name + '</a>';
                     }
