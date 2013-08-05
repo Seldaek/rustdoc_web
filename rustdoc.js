@@ -97,7 +97,14 @@ function extract(data, key) {
 }
 
 function extractDocs(elem) {
-    return extract(elem.attrs, 'doc').toString();
+    var res = '';
+    elem.attrs.forEach(function (attr) {
+        if (attr.hasOwnProperty('doc')) {
+            res = res + (res.length ? '\n' : '') + attr['doc'].toString();
+        }
+    });
+
+    return res;
 }
 
 function shortDescription(elem) {
