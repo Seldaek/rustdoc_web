@@ -3,27 +3,30 @@
 {% block definition %}
     <h2>Definition</h2>
 
-    <pre class="{{ type }}">
-trait {{ element.name }}{% if element.parents is not empty %}: {% for parent in element.parents %}{{ parent.path }}{# TODO enable once ids are fixed: {{ link_to_element(parent.id, type_tree) }}#}{% if not loop.last %} + {% endif %}{% endfor %}{% endif %} {
-{% for method in element.required_methods %}
-    {{ render_fn(method, type_tree, "traitfn") }};
+    {% set required_methods = extract_required_methods(element) %}
+    {% set provided_methods = extract_provided_methods(element) %}
+
+<pre class="{{ type }}">
+trait {{ element.name }}{{ render_generics(element) }}{% if element.inner.fields[0].parents is not empty %}: {% for parent in element.inner.fields[0].parents %}{{ parent.path.name }}{# TODO enable once ids are fixed: {{ link_to_element(parent.id, type_tree) }}#}{% if not loop.last %} + {% endif %}{% endfor %}{% endif %} {
+{% for method in required_methods %}
+    {{ render_fn(method, type_tree, "TraitFunction") }};
 {% endfor %}
-{% if element.default_methods is not empty and element.required_methods is not empty %}
+{% if provided_methods is not empty and required_methods is not empty %}
 
 {% endif %}
-{% for method in element.default_methods %}
-    {{ render_fn(method, type_tree, "traitfn") }} { <a title="View sources" href="{{ source_url(method, crate) }}">...</a> }
+{% for method in provided_methods %}
+    {{ render_fn(method, type_tree, "TraitFunction") }} { <a title="View sources" href="{{ source_url(method, crate) }}">...</a> }
 {% endfor %}
 }
 </pre>
 {% endblock %}
 
 {% block extra %}
-    {# TODO show inherit methods? #}
-    {% if element.required_methods is not empty %}
+    {# TODO show inherited methods? #}
+    {% if required_methods is not empty %}
     <h2>Required Methods</h2>
     <table>
-        {% for method in element.required_methods %}
+        {% for method in required_methods %}
             <tr>
                 <td>{{ method.name }}</td>
                 <td>{{ extract_docs(method) }}</td> {# TODO markdown #}
@@ -32,10 +35,10 @@ trait {{ element.name }}{% if element.parents is not empty %}: {% for parent in 
     </table>
     {% endif %}
 
-    {% if element.default_methods is not empty %}
+    {% if provided_methods is not empty %}
     <h2>Provided Methods</h2>
     <table>
-        {% for method in element.default_methods %}
+        {% for method in provided_methods %}
             <tr>
                 <td>{{ method.name }}</td>
                 <td>{{ extract_docs(method) }}</td> {# TODO markdown #}

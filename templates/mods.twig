@@ -13,7 +13,8 @@
                     {% for item in sort(type_tree[type ~ 's']) %}
                         {% set elem = element_by_id(item.id) %}
                         <tr>
-                            <td><code>{{ elem.def.name }}: {{ short_type(elem.def.type, elem.tree) }} = {{ elem.def.expr }}</code></td>
+                                                                        {# TODO should be ty #}
+                            <td><code>{{ elem.def.name }}: {{ short_type(elem.def.inner.fields[0].type_, elem.tree) }} = {{ elem.def.inner.fields[0].expr }}</code></td>
                             <td>{{ extract_docs(elem.def) }}</td> {# TODO markdown #}
                         </tr>
                     {% endfor %}
