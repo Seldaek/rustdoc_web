@@ -10,7 +10,7 @@
 <pre class="{{ type }}">
 struct {{ element.name }}{{ render_generics(element) }} {
 {% for field in fields %}
-    {{ field.name }}: {{ short_type(field.inner.fields[0].type_, type_tree) }}{% if not loop.last %},{% endif %}
+    {% if field.visibility == "private" %}priv {% endif %}{{ field.name }}: {{ short_type(field.inner.fields[0].type_, type_tree) }}{% if not loop.last %},{% endif %}
 
 {% endfor %}
 }
