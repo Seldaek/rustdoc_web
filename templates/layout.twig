@@ -57,10 +57,11 @@
                 </div>
             {% else %}
                 {% for type in ['mod', 'struct', 'enum', 'trait', 'fn'] %}
-                    {% if tree[type ~ 's'] is not empty %}
+                    {% set elems = filter_docable(tree[type ~ 's']) %}
+                    {% if elems is not empty %}
                         <div class="block {{ type }}">
                             <h2>{{ (type ~ 's')|trans }}</h2>
-                            {% for item in sort(tree[type ~ 's']) %}
+                            {% for item in sort(elems) %}
                                 <a class="{{ type }}{% if item.name == element.name %} current{% endif %}" href="{{ url_to_element(item.id, type_tree) }}">{{ item.name }}</a><br />
                             {% endfor %}
                         </div>

@@ -109,11 +109,21 @@ function extract(data, key) {
 }
 
 function extractDocs(elem) {
-    return extract(elem.attrs, 'doc').toString();
+    var docs = extract(elem.attrs, 'doc');
+
+    if (docs instanceof Array && docs[0].fields[0] === 'hidden') {
+        return false;
+    }
+
+    return docs.toString();
 }
 
 function shortDescription(elem) {
     var match, docblock = extractDocs(elem);
+
+    if (docblock === false) {
+        return '';
+    }
 
     match = docblock.match(/^([\s\S]+?)\r?\n[ \t\*]*\r?\n([\s\S]+)/);
     return match ? match[1].replace(/\n/g, '<br/>') : docblock;
@@ -207,6 +217,10 @@ function render(template, vars, references, version, cb) {
     vars.long_description = function (elem) {
         var match, docblock = extractDocs(elem);
 
+        if (docblock === false) {
+            return '';
+        }
+
         match = docblock.match(/^([\s\S]+?)\r?\n[ \t\*]*\r?\n([\s\S]+)/);
         return match ? match[2].replace(/\n/g, '<br/>') : '';
     };
@@ -278,6 +292,15 @@ function render(template, vars, references, version, cb) {
         });
 
         return out + '::';
+    };
+    vars.filter_docable = function (elems) {
+        var key, filtered = {};
+        for (key in elems) {
+            if (extractDocs(references[key].def) !== false) {
+                filtered[key] = elems[key];
+            }
+        }
+        return filtered;
     };
     vars.extract_docs = extractDocs;
     vars.short_enum_type = function (type, currentTree) {
@@ -407,7 +430,7 @@ function render(template, vars, references, version, cb) {
         }).join(', \n    ');
         output += '\n)';
 
-        if (decl.output !== 'Unit') { // TODO fix this condition
+        if (decl.output !== 'Unit') {
             output += ' -&gt; ' + vars.short_type(decl.output, currentTree);
         }
 
