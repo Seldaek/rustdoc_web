@@ -403,7 +403,7 @@ function render(template, vars, references, version, cb) {
 
         output += 'fn' + (fn.name ? ' ' + fn.name : '') + vars.render_generics(fn, fnType) + '(\n    ';
         output += decl.inputs.map(function (arg) {
-            return (arg.name ? arg.name + ': ' : '') + vars.short_type(arg.ty, currentTree);
+            return (arg.name ? arg.name + ': ' : '') + vars.short_type(arg.type_, currentTree);
         }).join(', \n    ');
         output += '\n)';
 
@@ -520,13 +520,8 @@ function indexModule(path, module, typeTree, references, searchIndex) {
         } else if (type === 'impls') {
             // TODO build cross-link of implemented stuff and traits implemented
             return;
-        } else {
-            // TODO remove this
-            def.id = def.inner.fields[0].id;
-
-            if (def.id === undefined) {
-                throw new Error('Missing id on type ' + type + ' content: ' + JSON.stringify(def));
-            }
+        } else if (def.id === undefined) {
+            throw new Error('Missing id on type ' + type + ' content: ' + JSON.stringify(def));
         }
 
         // FIXME all the ifs
