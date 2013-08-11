@@ -229,6 +229,9 @@ function render(template, vars, references, version, cb) {
     };
     vars.link_to_element = function (id, currentTree) {
         var modPrefix = '';
+        if (!currentTree) {
+            throw new Error('Missing currentTree arg #2');
+        }
         if (references[id].tree !== currentTree) {
             modPrefix = modPath(references[id].tree);
         }
@@ -272,6 +275,9 @@ function render(template, vars, references, version, cb) {
         return references[id];
     };
     vars.url_to_element = function (id, currentTree) {
+        if (!currentTree) {
+            throw new Error('Missing currentTree arg #2');
+        }
         if (references[id].type === 'mods') {
             return relativePath(currentTree, references[id].tree) + references[id].def.name + '/index.html';
         }

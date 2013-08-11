@@ -53,7 +53,7 @@ struct {{ element.name }}{{ render_generics(element, type_tree) }} {
         <h2>Trait Implementations</h2>
 
         {% for impl in trait_impls %}
-            <h3><code>impl{{ render_generics(impl, type_tree) }} of {{ impl.inner.fields[0].trait_.path.name }}{# {{ link_to_element(impl.inner.fields[0].trait_.id) }}#} {{ render_generics(impl.inner.fields[0].trait_.path, type_tree, 'bound') }} for {{ short_type(impl.inner.fields[0].for_, type_tree) }}</code></h3>
+            <h3><code>impl{{ render_generics(impl, type_tree) }} of {{ impl.inner.fields[0].trait_.path.name }}{#{{ link_to_element(impl.inner.fields[0].trait_.id, type_tree) }}#} {{ render_generics(impl.inner.fields[0].trait_.path, type_tree, 'bound') }} for {{ short_type(impl.inner.fields[0].for_, type_tree) }}</code></h3>
             <table>
                 {% for method in impl.inner.fields[0].methods %}
                     <tr>
