@@ -7,7 +7,7 @@
     {% set provided_methods = extract_provided_methods(element) %}
 
 <pre class="{{ type }}">
-trait {{ element.name }}{{ render_generics(element, type_tree) }}{% if element.inner.fields[0].parents is not empty %}: {% for parent in element.inner.fields[0].parents %}{{ parent.path.name }}{{ render_generics(parent.path, type_tree, 'bound') }}{# TODO enable once ids are fixed: {{ link_to_element(parent.id, type_tree) }}#}{% if not loop.last %} + {% endif %}{% endfor %}{% endif %} {
+trait {{ element.name }}{{ render_generics(element, type_tree) }}{% if element.inner.fields[0].parents is not empty %}: {% for parent in element.inner.fields[0].parents %}{{ short_type(parent, type_tree) }}{% if not loop.last %} + {% endif %}{% endfor %}{% endif %} {
 {% for method in required_methods %}
     {{ render_fn(method, type_tree, "TraitFunction") }};
 {% endfor %}

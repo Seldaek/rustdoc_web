@@ -405,6 +405,8 @@ function render(template, vars, references, version, cb) {
             return '~' + shortType(type.fields[0], currentTree, realType);
         case 'Vector':
             return '[' + shortType(type.fields[0], currentTree, realType) + ']';
+        case 'FixedVector':
+            return '[' + shortType(type.fields[0], currentTree, realType) + ', ..' + type.fields[1] + ']';
         case 'Bottom':
             return '!';
         case 'Self':
@@ -505,7 +507,11 @@ function render(template, vars, references, version, cb) {
             if (bound === 'RegionBound') {
                 return "'static";
             }
-            if (bound.fields === undefined) {
+            if (bound.variant === 'TraitBound') {
+                return vars.short_type(bound.fields[0], currentTree);
+            }
+
+            if (bound.fields === undefined || bound.fields[0].path === undefined) {
                 throw new Error("Unknown bound type " + JSON.stringify(bound));
             }
             bound = bound.fields[0].path;
@@ -537,7 +543,7 @@ function render(template, vars, references, version, cb) {
                     res = vars.short_type(t, currentTree);
                 }
                 if (t.bounds && t.bounds[0] !== undefined) {
-                    res += ":" + t.bounds.map(renderBounds).join(' + ');
+                    res += ": " + t.bounds.map(renderBounds).join(' + ');
                 }
 
                 return res;
@@ -610,7 +616,7 @@ function indexModule(path, module, typeTree, references, searchIndex) {
         }
 
         // TODO this is the id of the particular impl, not of the trait, perhaps, perhaps not
-        ofId = def.inner.fields[0].trait_ ? def.inner.fields[0].trait_.id : null;
+        ofId = def.inner.fields[0].trait_ ? def.inner.fields[0].trait_.fields[2] : null;
 
         generics = getGenerics(def);
         if (generics && generics.type_params) {
