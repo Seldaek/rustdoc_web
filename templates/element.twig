@@ -9,7 +9,7 @@
     {% endblock %}
 
     {% block short_description %}
-        {{ short_description(element) }}
+        <section class="docblock">{{ short_description(element) }}</section>
     {% endblock %}
 
     {% block definition %}{% endblock %}
@@ -18,7 +18,7 @@
         {% set longdesc = long_description(element) %}
         {% if longdesc is not empty %}
             <h2>Documentation</h2>
-            {{ longdesc }} {# TODO markdown render #}
+            <section class="docblock">{{ longdesc }}</section>
         {% endif %}
     {% endblock %}
 

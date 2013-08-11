@@ -29,7 +29,7 @@ trait {{ element.name }}{{ render_generics(element, type_tree) }}{% if element.i
         {% for method in required_methods %}
             <tr>
                 <td>{{ method.name }}</td>
-                <td>{{ extract_docs(method) }}</td> {# TODO markdown #}
+                <td class="docblock">{{ extract_docs(method) }}</td>
             </tr>
         {% endfor %}
     </table>
@@ -41,7 +41,7 @@ trait {{ element.name }}{{ render_generics(element, type_tree) }}{% if element.i
         {% for method in provided_methods %}
             <tr>
                 <td>{{ method.name }}</td>
-                <td>{{ extract_docs(method) }}</td> {# TODO markdown #}
+                <td class="docblock">{{ extract_docs(method) }}</td>
             </tr>
         {% endfor %}
     </table>

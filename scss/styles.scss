@@ -83,6 +83,18 @@
         }
     }
 
+    .docblock {
+        h1 {
+            font-size: 1.2em;
+        }
+        h2 {
+            font-size: 1.1em;
+        }
+        h3, h4, h5 {
+            font-size: 1em;
+        }
+    }
+
     .source {
         float: right;
     }
@@ -95,6 +107,9 @@
         vertical-align: top;
         &:first-child {
            padding-right: $contentPadding;
+        }
+        p:first-child {
+            margin-top: 0;
         }
     }
 

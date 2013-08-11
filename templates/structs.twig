@@ -53,7 +53,7 @@ impl{{ render_generics(impl, type_tree) }}{% if type == 'trait_impls' %} of {{ s
                         {% if docs is not empty %}
                             <tr>
                                 <td>{{ method.name }}</td>
-                                <td>{{ docs }}</td> {# TODO markdown & take docs of the method on the trait if it is empty? #}
+                                <td class="docblock">{{ docs }}</td>
                             </tr>
                         {% endif %}
                     {% endfor %}

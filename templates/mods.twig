@@ -14,9 +14,8 @@
                     {% for item in sort(elems) %}
                         {% set elem = element_by_id(item.id) %}
                         <tr>
-                                                                        {# TODO should be ty #}
                             <td><code>{{ elem.def.name }}: {{ short_type(elem.def.inner.fields[0].type_, elem.tree) }} = {{ elem.def.inner.fields[0].expr }}</code></td>
-                            <td>{{ extract_docs(elem.def) }}</td> {# TODO markdown #}
+                            <td class="docblock">{{ extract_docs(elem.def) }}</td>
                         </tr>
                     {% endfor %}
                 </table>

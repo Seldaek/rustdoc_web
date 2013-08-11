@@ -24,6 +24,43 @@ config.menu = config.menu || [];
 config.title = config.title || '';
 config.rustVersion = config.rustVersion || '0.8'; // TODO should be current once the latest version is built as current
 config.knownCrates = config.knownCrates || {};
+config.docBlockRenderer = 'markdown';
+
+var renderDocs;
+
+if (config.docBlockRenderer === 'markdown') {
+    renderDocs = (function () {
+        var marked = require('marked'),
+            hljs = require('highlight.js'),
+            options = {
+                gfm: true,
+                highlight: function (code, lang) {
+                    return hljs.highlightAuto(code).value;
+                    //return hljs.highlight(lang || 'rust', code).value;
+                },
+                tables: true,
+                breaks: false,
+                pedantic: false,
+                sanitize: false,
+                smartLists: true,
+                smartypants: false,
+                langPrefix: 'lang-'
+            };
+
+        marked.setOptions(options);
+
+        return function (str) {
+            var tokens;
+            if (str === '') {
+                return str;
+            }
+            tokens = marked.lexer(str, options);
+            return marked.parser(tokens);
+        };
+    }());
+} else {
+    throw new Error('Invalid docblock renderer: ' + config.docBlockRenderer);
+}
 
 // merge in default known crates
 [
@@ -113,25 +150,31 @@ function extract(data, key) {
     return res;
 }
 
-function extractDocs(elem) {
+function extractDocs(elem, skipFormatting) {
     var docs = extract(elem.attrs, 'doc');
 
     if (docs instanceof Array && docs[0].fields[0] === 'hidden') {
         return false;
     }
 
-    return docs.toString();
+    docs = docs.toString();
+
+    return skipFormatting === true ? docs : renderDocs(docs);
 }
 
-function shortDescription(elem) {
-    var match, docblock = extractDocs(elem);
+function shortDescription(elem, skipFormatting) {
+    var match, docblock = extractDocs(elem, true);
 
     if (docblock === false) {
         return '';
     }
 
     match = docblock.match(/^([\s\S]+?)\r?\n[ \t\*]*\r?\n([\s\S]+)/);
-    return match ? match[1].replace(/\n/g, '<br/>') : docblock;
+    if (match) {
+        docblock = match[1];
+    }
+
+    return skipFormatting === true ? docblock : renderDocs(docblock);
 }
 
 function getPath(tree) {
@@ -220,14 +263,14 @@ function render(template, vars, references, version, cb) {
     // helpers
     vars.short_description = shortDescription;
     vars.long_description = function (elem) {
-        var match, docblock = extractDocs(elem);
+        var match, docblock = extractDocs(elem, true);
 
         if (docblock === false) {
             return '';
         }
 
         match = docblock.match(/^([\s\S]+?)\r?\n[ \t\*]*\r?\n([\s\S]+)/);
-        return match ? match[2].replace(/\n/g, '<br/>') : '';
+        return match ? renderDocs(match[2]) : '';
     };
     vars.link_to_element = function (id, currentTree) {
         var modPrefix = '';
@@ -650,7 +693,7 @@ function indexModule(path, module, typeTree, references, searchIndex) {
             if (generics && generics.type_params) {
                 indexTyparams(generics.type_params);
             }
-            searchIndex.push({type: 'method', name: method.name, parent: parentName, parentType: parentType, desc: shortDescription(method), path: getPath(typeTree).join('::')});
+            searchIndex.push({type: 'method', name: method.name, parent: parentName, parentType: parentType, desc: shortDescription(method, true), path: getPath(typeTree).join('::')});
         });
     }
 
@@ -734,7 +777,7 @@ function indexModule(path, module, typeTree, references, searchIndex) {
         }
 
         typeTree[type][def.id] = name;
-        searchIndex.push({type: shortenType(type), name: name, path: getPath(typeTree).join('::'), desc: shortDescription(def)});
+        searchIndex.push({type: shortenType(type), name: name, path: getPath(typeTree).join('::'), desc: shortDescription(def, true)});
         references[def.id] = {type: type, def: def, tree: typeTree};
     }
 
