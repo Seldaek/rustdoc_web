@@ -365,13 +365,11 @@ function render(template, vars, references, version, cb) {
         case 'Primitive':
             return primitiveType(type.fields[0]);
 
-        case 'Resolved':
-            if (!references[type.fields[0]]) {
-                console.log('INVALID RESOLVED REFERENCE ID ' + type.fields[0]);
-                return '&lt;ID:' + type.fields[0] + '&gt;'; // TODO fix this
-                // throw new Error('Invalid resolved ref id: ' + type.fields[0]);
+        case 'ResolvedPath':
+            if (!references[type.fields[2]]) {
+                throw new Error('Invalid resolved ref id: ' + type.fields[2]);
             }
-            return vars.link_to_element(type.fields[0], currentTree);
+            return vars.link_to_element(type.fields[2], currentTree) + vars.render_generics(type.fields[0], currentTree, 'arg');
 
         case 'External':
             //                           external path   external type
@@ -389,19 +387,27 @@ function render(template, vars, references, version, cb) {
         case 'Bool':
             return 'bool';
         case 'Managed':
-            return '@' + shortType(type.fields[0], currentTree, realType);
+            return '@' + (type.fields[0] === 'Mutable' ? 'mut ' : '') + shortType(type.fields[1], currentTree, realType);
+        case 'RawPointer':
+            return '*' + (type.fields[0] === 'Mutable' ? 'mut ' : '') + shortType(type.fields[1], currentTree, realType);
+        case 'BorrowedRef':
+            return '&' + (type.fields[0] ? "'" + type.fields[0]._field0 + ' ' : '') + (type.fields[1] === 'Mutable' ? 'mut ' : '') + shortType(type.fields[2], currentTree, realType);
         case 'Unique':
             return '~' + shortType(type.fields[0], currentTree, realType);
-        case 'BorrowedRef':
-            return '&' + shortType(type.fields[0], currentTree, realType);
-        case 'RawPointer':
-            return '*' + shortType(type.fields[0], currentTree, realType);
         case 'Vector':
             return '[' + shortType(type.fields[0], currentTree, realType) + ']';
         case 'Bottom':
             return '!';
         case 'Self':
             return 'Self';
+        case 'SelfStatic':
+            return '';
+        case 'SelfValue':
+            return 'self';
+        case 'SelfManaged':
+            return '@' + (type.fields[0] === 'Mutable' ? 'mut ' : '') + 'self';
+        case 'SelfBorrowed':
+            return '&' + (type.fields[0] ? type.fields[0]._field0 + ' ' : '') + (type.fields[1] === 'Mutable' ? 'mut ' : '') + 'self';
         case 'Closure':
             return vars.render_fn(type.fields[0], currentTree, 'Closure');
         case 'Generic':
@@ -418,13 +424,38 @@ function render(template, vars, references, version, cb) {
         throw new Error('Can not render short type: ' + (realType || type.variant) + ' ' + JSON.stringify(type));
     };
     vars.render_fn = function (fn, currentTree, fnType) {
-        var output = '', decl = getDecl(fn);
+        var output = '', decl = getDecl(fn), temp;
 
-        if (fnType === 'Closure' && fn.onceness === 'once') {
-            output += 'once ';
+        if (fnType === 'Closure') {
+            if (fn.sigil) {
+                if (fn.sigil === 'BorrowedSigil') {
+                    output += '&';
+                } else if (fn.sigil === 'ManagedSigil') {
+                    output += '@';
+                } else if (fn.sigil === 'OwnedSigil') {
+                    output += '~';
+                } else {
+                    throw new Error('Unknown sigil type ' + fn.sigil);
+                }
+            }
+            if (fn.region) {
+                output += "'" + fn.region._field0 + " ";
+            }
+            if (fn.onceness === 'once') {
+                output += 'once ';
+            }
         }
 
-        output += 'fn' + (fn.name ? ' ' + fn.name : '') + vars.render_generics(fn, fnType) + '(\n    ';
+        output += 'fn' + (fn.name ? ' ' + fn.name : '') + vars.render_generics(fn, currentTree, fnType) + '(\n    ';
+        if (fn.inner && fn.inner.fields && fn.inner.fields[0].self_) {
+            temp = vars.short_type(fn.inner.fields[0].self_, currentTree);
+            if (temp) {
+                output += temp;
+                if (decl.inputs.length > 0) {
+                    output += ', \n    ';
+                }
+            }
+        }
         output += decl.inputs.map(function (arg) {
             return (arg.name ? arg.name + ': ' : '') + vars.short_type(arg.type_, currentTree);
         }).join(', \n    ');
@@ -442,18 +473,38 @@ function render(template, vars, references, version, cb) {
 
         return output;
     };
-    vars.render_generics = function (element, fnType) {
+    vars.render_generics = function renderGenerics(element, currentTree, type) {
         var type_params, lifetimes, output = '', generics;
 
-        if (fnType === 'Closure') {
-            generics = {typarams: [], lifetimes: element.lifetimes};
-        } else if (fnType === 'BareFunction') {
+        if (type === 'Closure') {
+            generics = {type_params: [], lifetimes: element.lifetimes};
+        } else if (type === 'BareFunction') {
             generics = element.generics;
+        } else if (type === 'arg' || type === 'bound') {
+            generics = {type_params: element.typarams, lifetimes: element.lifetime ? [element.lifetime] : null};
         } else {
             generics = getGenerics(element);
         }
         if (!generics) {
             throw new Error('Element has invalid generics defined ' + JSON.stringify(element));
+        }
+
+        function renderBounds(bound) {
+            var res = '';
+            if (bound === 'RegionBound') {
+                return "'static";
+            }
+            if (bound.fields === undefined) {
+                throw new Error("Unknown bound type " + JSON.stringify(bound));
+            }
+            bound = bound.fields[0].path;
+
+            if (bound.name) {
+                res += bound.name;
+            }
+            res += renderGenerics(bound, currentTree, 'bound');
+
+            return res;
         }
 
         type_params = generics.type_params || [];
@@ -467,7 +518,19 @@ function render(template, vars, references, version, cb) {
             if (type_params.length && lifetimes.length) {
                 output += ', ';
             }
-            output += type_params.map(function (t) { return t.name; }).join(', ');
+            output += type_params.map(function (t) {
+                var res;
+                if (t.name) {
+                    res = t.name;
+                } else {
+                    res = vars.short_type(t, currentTree);
+                }
+                if (t.bounds && t.bounds[0] !== undefined) {
+                    res += ": " + renderBounds(t.bounds[0]);
+                }
+
+                return res;
+            }).join(', ');
             output += '&gt;';
         }
 
@@ -681,8 +744,8 @@ function renderVersionsIndex(versions) {
 }
 
 function initCrate(crate, searchIndex) {
-    var sourceUrl, data = JSON.parse(fs.readFileSync(crate.path));
-    if (data.schema !== '0.7.0') {
+    var sourceUrl, delayedIndexations, data = JSON.parse(fs.readFileSync(crate.path));
+    if (data.schema !== '0.8.0') {
         throw new Error('Unsupported schema ' + data.schema);
     }
 

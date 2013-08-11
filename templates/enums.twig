@@ -3,7 +3,7 @@
 {% block definition %}
 <h2>Definition</h2>
 <pre class="{{ type }}">
-enum {{ element.name }}{{ render_generics(element) }} {
+enum {{ element.name }}{{ render_generics(element, type_tree) }} {
 {% for variant in element.inner.fields[0].variants %}
     {{ variant.name }}{{ short_enum_type(variant.inner.fields[0].kind, type_tree) }},
 {% endfor %}

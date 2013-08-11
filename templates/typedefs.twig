@@ -3,5 +3,5 @@
 {% block definition %}
     <h2>Definition</h2>
     {# TODO fix the short_type call should be the exact typedef definition #}
-    <pre>type {{ element.name }}{{ render_generics(element) }} = {{ short_type(element.inner.fields[0].type_, type_tree) }};</pre>
+    <pre>type {{ element.name }}{{ render_generics(element, type_tree) }} = {{ short_type(element.inner.fields[0].type_, type_tree) }};</pre>
 {% endblock %}

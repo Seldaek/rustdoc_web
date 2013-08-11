@@ -8,7 +8,7 @@
 
 {% if struct_type == 'Plain' %}
 <pre class="{{ type }}">
-struct {{ element.name }}{{ render_generics(element) }} {
+struct {{ element.name }}{{ render_generics(element, type_tree) }} {
 {% for field in fields %}
     {% if field.visibility == "private" %}priv {% endif %}{{ field.name }}: {{ short_type(field.inner.fields[0].type_, type_tree) }}{% if not loop.last %},{% endif %}
 
@@ -16,9 +16,9 @@ struct {{ element.name }}{{ render_generics(element) }} {
 }
 </pre>
 {% elseif struct_type == 'Tuple' or struct_type == 'Newtype' %}
-    <pre class="{{ type }}">struct {{ element.name }}{{ render_generics(element) }}({% for field in fields %}{{ short_type(field.inner.fields[0].type_, type_tree) }}{% if not loop.last %}, {% endif %}{% endfor %});</pre>
+    <pre class="{{ type }}">struct {{ element.name }}{{ render_generics(element, type_tree) }}({% for field in fields %}{{ short_type(field.inner.fields[0].type_, type_tree) }}{% if not loop.last %}, {% endif %}{% endfor %});</pre>
 {% elseif struct_type == 'Unit' %}
-    <pre class="{{ type }}">struct {{ element.name }}{{ render_generics(element) }};</pre>
+    <pre class="{{ type }}">struct {{ element.name }}{{ render_generics(element, type_tree) }};</pre>
 {% else %}
     <pre class="{{ type }}">Unkwown struct type: {{ struct_type }}</pre>
 {% endif %}
