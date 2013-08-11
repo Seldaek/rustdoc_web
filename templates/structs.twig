@@ -38,7 +38,7 @@ struct {{ element.name }}{{ render_generics(element, type_tree) }} {
 
             {% for impl in impls %}
                 <pre class="struct">
-impl{{ render_generics(impl, type_tree) }}{% if type == 'trait_impls' %} of {{ short_type(impl.inner.fields[0].trait_, type_tree) }} for {% endif %}{{ short_type(impl.inner.fields[0].for_, type_tree) }} {
+impl{{ render_generics(impl, type_tree) }} {% if type == 'trait_impls' %}of {{ short_type(impl.inner.fields[0].trait_, type_tree) }} for {% endif %}{{ short_type(impl.inner.fields[0].for_, type_tree) }} {
 {% for method in impl.inner.fields[0].methods %}
     {{ render_fn(method, type_tree) }} { ... }
 {% endfor %}

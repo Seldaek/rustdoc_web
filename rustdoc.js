@@ -136,7 +136,7 @@ function createTypeTreeNode(name, parent) {
 }
 
 function shortenType(type) {
-    return type.substring(0, type.length - 1);
+    return type.match(/s$/) ? type.substring(0, type.length - 1) : type;
 }
 
 function extract(data, key) {
@@ -391,16 +391,21 @@ function render(template, vars, references, version, cb) {
 
         return foundDocs;
     };
-    vars.unique_sorted_trait_impls = function (impls) {
-        var ids = [], uniqueImpls = [];
+    vars.unique_sorted_trait_impls = function (id, currentTree) {
+        var impls, knownStructIds = [], uniqueImpls = [];
+
+        impls = currentTree.implsof[id] || [];
+
+        // TODO possibly collect implsof in a version.implsof instead of the tree,
+        // so that crates can share it and we can display every implementor here
 
         impls.forEach(function (impl) {
-            var id;
+            var structId;
             if (impl.inner.fields[0].for_.variant === 'ResolvedPath') {
-                id = impl.inner.fields[0].for_.fields[2];
-                if (ids.indexOf(id) === -1) {
+                structId = impl.inner.fields[0].for_.fields[2];
+                if (knownStructIds.indexOf(structId) === -1) {
                     uniqueImpls.push(impl);
-                    ids.push(id);
+                    knownStructIds.push(structId);
                 }
             } else {
                 uniqueImpls.push(impl);
@@ -704,14 +709,21 @@ function indexModule(path, module, typeTree, references, searchIndex) {
     }
 
     function indexImpl(def) {
-        var generics, forId, ofId;
+        var generics, forId = null, ofId = null;
 
         if (def.inner.fields[0].for_.variant === 'ResolvedPath') {
             forId = def.inner.fields[0].for_.fields[2];
         }
 
-        // TODO this is the id of the particular impl, not of the trait, perhaps, perhaps not
-        ofId = def.inner.fields[0].trait_ ? def.inner.fields[0].trait_.fields[2] : null;
+        if (def.inner.fields[0].trait_) {
+            if (def.inner.fields[0].trait_.variant === 'ResolvedPath') {
+                ofId = def.inner.fields[0].trait_.fields[2];
+            } else if (def.inner.fields[0].trait_.variant === 'External') {
+                ofId = 'trait ' + def.inner.fields[0].trait_.fields[0];
+            } else {
+                throw new Error('Unknown trait definition: ' + JSON.stringify(def));
+            }
+        }
 
         generics = getGenerics(def);
         if (generics && generics.type_params) {

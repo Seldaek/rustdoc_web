@@ -47,12 +47,12 @@ trait {{ element.name }}{{ render_generics(element, type_tree) }}{% if element.i
     </table>
     {% endif %}
 
-    {% set impls = type_tree.implsof[element.id] %}
+    {% set impls = unique_sorted_trait_impls(element.id, type_tree) %}
 
     {% if impls is not empty %}
         <h2 id="implementors">Implementors</h2>
         <ul class="item-list">
-            {% for impl in unique_sorted_trait_impls(impls) %}
+            {% for impl in impls %}
                 {% if impl.inner.fields[0].for_.variant == 'ResolvedPath' %}
                     <li>{{ short_type(impl.inner.fields[0].for_, type_tree, null, true) }}</li>
                 {% else %}
