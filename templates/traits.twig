@@ -24,7 +24,7 @@ trait {{ element.name }}{{ render_generics(element, type_tree) }}{% if element.i
 {% block extra %}
     {# TODO show inherited methods? #}
     {% if required_methods is not empty %}
-    <h2>Required Methods</h2>
+    <h2 id="required-methods">Required Methods</h2>
     <table>
         {% for method in required_methods %}
             <tr>
@@ -36,7 +36,7 @@ trait {{ element.name }}{{ render_generics(element, type_tree) }}{% if element.i
     {% endif %}
 
     {% if provided_methods is not empty %}
-    <h2>Provided Methods</h2>
+    <h2 id="provided-methods">Provided Methods</h2>
     <table>
         {% for method in provided_methods %}
             <tr>
@@ -45,5 +45,20 @@ trait {{ element.name }}{{ render_generics(element, type_tree) }}{% if element.i
             </tr>
         {% endfor %}
     </table>
+    {% endif %}
+
+    {% set impls = type_tree.implsof[element.id] %}
+
+    {% if impls is not empty %}
+        <h2 id="implementors">Implementors</h2>
+        <ul class="item-list">
+            {% for impl in unique_sorted_trait_impls(impls) %}
+                {% if impl.inner.fields[0].for_.variant == 'ResolvedPath' %}
+                    <li>{{ short_type(impl.inner.fields[0].for_, type_tree, null, true) }}</li>
+                {% else %}
+                    <li><pre class="trait">impl{{ render_generics(impl, type_tree) }} of {{ short_type(impl.inner.fields[0].trait_, type_tree) }} for {{ short_type(impl.inner.fields[0].for_, type_tree) }}</pre></li>
+                {% endif %}
+            {% endfor %}
+        </ul>
     {% endif %}
 {% endblock %}

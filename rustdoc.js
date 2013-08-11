@@ -87,12 +87,14 @@ function createTypeTreeNode(name, parent) {
         enums: {},
         traits: {},
         typedefs: {},
-        impls: {}, // implementations for a given struct
-        implsfor: {}, // implementations of traits for a given struct
-        implsof: {}, // implementations of a given trait
         fns: {},
         reexports: {},
         statics: {},
+
+        // reuse the instance of the parent tree so all trees share the impls because they need to be discoverable across the board
+        impls: parent ? parent.impls : {}, // implementations for a given struct
+        implsfor: parent ? parent.implsfor : {}, // implementations of traits for a given struct
+        implsof: parent ? parent.implsof : {}, // implementations of a given trait
     };
 }
 
@@ -329,6 +331,56 @@ function render(template, vars, references, version, cb) {
             return a.name.localeCompare(b.name);
         });
     };
+    vars.extract_parent_docs = function (impl, methodName) {
+        var foundDocs = '';
+        if (impl.inner.fields[0].trait_ === null) {
+            return '';
+        }
+        if (impl.inner.fields[0].trait_.variant !== 'ResolvedPath') {
+            return '';
+        }
+
+        references[impl.inner.fields[0].trait_.fields[2]].def.inner.fields[0].methods.forEach(function (method) {
+            if (method.fields[0].name === methodName) {
+                foundDocs = extractDocs(method.fields[0]);
+            }
+        });
+
+        return foundDocs;
+    };
+    vars.unique_sorted_trait_impls = function (impls) {
+        var ids = [], uniqueImpls = [];
+
+        impls.forEach(function (impl) {
+            var id;
+            if (impl.inner.fields[0].for_.variant === 'ResolvedPath') {
+                id = impl.inner.fields[0].for_.fields[2];
+                if (ids.indexOf(id) === -1) {
+                    uniqueImpls.push(impl);
+                    ids.push(id);
+                }
+            } else {
+                uniqueImpls.push(impl);
+            }
+        });
+
+        return uniqueImpls.sort(function (a, b) {
+            var aResolved = a.inner.fields[0].for_.variant === 'ResolvedPath',
+                bResolved = b.inner.fields[0].for_.variant === 'ResolvedPath';
+            if (aResolved && bResolved) {
+                return references[a.inner.fields[0].for_.fields[2]].def.name.localeCompare(references[b.inner.fields[0].for_.fields[2]].def.name);
+            }
+
+            if (aResolved) {
+                return -1;
+            }
+            if (bResolved) {
+                return 1;
+            }
+
+            return 0;
+        });
+    };
     vars.extract_required_methods = function (trait) {
         var res = [];
         trait.inner.fields[0].methods.forEach(function (method) {
@@ -359,7 +411,7 @@ function render(template, vars, references, version, cb) {
 
         return count;
     };
-    vars.short_type = function shortType(type, currentTree, realType) {
+    vars.short_type = function shortType(type, currentTree, realType, pureLink) {
         var types;
 
         if (!currentTree) {
@@ -378,7 +430,7 @@ function render(template, vars, references, version, cb) {
             if (!references[type.fields[2]]) {
                 throw new Error('Invalid resolved ref id: ' + type.fields[2]);
             }
-            return vars.link_to_element(type.fields[2], currentTree) + vars.render_generics(type.fields[0], currentTree, 'arg');
+            return vars.link_to_element(type.fields[2], currentTree) + (pureLink === true ? '' : vars.render_generics(type.fields[0], currentTree, 'arg'));
 
         case 'External':
             //                           external path   external type

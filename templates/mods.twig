@@ -22,7 +22,6 @@
                 </table>
             {% else %}
                 <ul class="item-list{% if count(elems) > 25 %} multi-column{% endif %}">
-                    {{ elems.length }}
                     {% for item in sort(elems) %}
                         <li>{{ link_to_element(item.id, type_tree) }}</li>
                     {% endfor %}
