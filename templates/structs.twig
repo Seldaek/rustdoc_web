@@ -24,3 +24,48 @@ struct {{ element.name }}{{ render_generics(element, type_tree) }} {
 {% endif %}
 
 {% endblock %}
+
+{% block extra %}
+    {% set impls = type_tree.impls[element.id] %}
+    {% set trait_impls = type_tree.implsfor[element.id] %}
+
+    {% if impls is not empty %}
+        <h2>Methods</h2>
+
+        {% for impl in impls %}
+            <h3><code>impl{{ render_generics(impl, type_tree) }} {{ short_type(impl.inner.fields[0].for_, type_tree) }}</code></h3>
+            <table>
+                {% for method in impl.inner.fields[0].methods %}
+                    <tr>
+                        <td>{{ method.name }}</td>
+                        <td>{{ extract_docs(method) }}</td> {# TODO markdown #}
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><code>{{ render_fn(method, type_tree) }}</code></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endfor %}
+    {% endif %}
+
+    {% if trait_impls is not empty %}
+        <h2>Trait Implementations</h2>
+
+        {% for impl in trait_impls %}
+            <h3><code>impl{{ render_generics(impl, type_tree) }} of {{ impl.inner.fields[0].trait_.path.name }}{# {{ link_to_element(impl.inner.fields[0].trait_.id) }}#} {{ render_generics(impl.inner.fields[0].trait_.path, type_tree, 'bound') }} for {{ short_type(impl.inner.fields[0].for_, type_tree) }}</code></h3>
+            <table>
+                {% for method in impl.inner.fields[0].methods %}
+                    <tr>
+                        <td>{{ method.name }}</td>
+                        <td>{{ extract_docs(method) }}</td> {# TODO markdown #}
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td><code>{{ render_fn(method, type_tree) }}</code></td>
+                    </tr>
+                {% endfor %}
+            </table>
+        {% endfor %}
+    {% endif %}
+{% endblock %}

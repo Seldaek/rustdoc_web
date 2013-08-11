@@ -87,6 +87,9 @@ function createTypeTreeNode(name, parent) {
         enums: {},
         traits: {},
         typedefs: {},
+        impls: {}, // implementations for a given struct
+        implsfor: {}, // implementations of traits for a given struct
+        implsof: {}, // implementations of a given trait
         fns: {},
         reexports: {},
         statics: {},
@@ -391,7 +394,7 @@ function render(template, vars, references, version, cb) {
         case 'RawPointer':
             return '*' + (type.fields[0] === 'Mutable' ? 'mut ' : '') + shortType(type.fields[1], currentTree, realType);
         case 'BorrowedRef':
-            return '&' + (type.fields[0] ? "'" + type.fields[0]._field0 + ' ' : '') + (type.fields[1] === 'Mutable' ? 'mut ' : '') + shortType(type.fields[2], currentTree, realType);
+            return '&amp;' + (type.fields[0] ? "'" + type.fields[0]._field0 + ' ' : '') + (type.fields[1] === 'Mutable' ? 'mut ' : '') + shortType(type.fields[2], currentTree, realType);
         case 'Unique':
             return '~' + shortType(type.fields[0], currentTree, realType);
         case 'Vector':
@@ -404,10 +407,12 @@ function render(template, vars, references, version, cb) {
             return '';
         case 'SelfValue':
             return 'self';
+        case 'SelfOwned':
+            return '~self';
         case 'SelfManaged':
             return '@' + (type.fields[0] === 'Mutable' ? 'mut ' : '') + 'self';
         case 'SelfBorrowed':
-            return '&' + (type.fields[0] ? type.fields[0]._field0 + ' ' : '') + (type.fields[1] === 'Mutable' ? 'mut ' : '') + 'self';
+            return '&amp;' + (type.fields[0] ? type.fields[0]._field0 + ' ' : '') + (type.fields[1] === 'Mutable' ? 'mut ' : '') + 'self';
         case 'Closure':
             return vars.render_fn(type.fields[0], currentTree, 'Closure');
         case 'Generic':
@@ -429,7 +434,7 @@ function render(template, vars, references, version, cb) {
         if (fnType === 'Closure') {
             if (fn.sigil) {
                 if (fn.sigil === 'BorrowedSigil') {
-                    output += '&';
+                    output += '&amp;';
                 } else if (fn.sigil === 'ManagedSigil') {
                     output += '@';
                 } else if (fn.sigil === 'OwnedSigil') {
@@ -526,7 +531,7 @@ function render(template, vars, references, version, cb) {
                     res = vars.short_type(t, currentTree);
                 }
                 if (t.bounds && t.bounds[0] !== undefined) {
-                    res += ": " + renderBounds(t.bounds[0]);
+                    res += ":" + t.bounds.map(renderBounds).join(' + ');
                 }
 
                 return res;
@@ -553,17 +558,18 @@ function render(template, vars, references, version, cb) {
 }
 
 function indexModule(path, module, typeTree, references, searchIndex) {
-    var types = {
-        ModuleItem: 'mods',
-        StructItem: 'structs',
-        EnumItem: 'enums',
-        TraitItem: 'traits',
-        TypedefItem: 'typedefs',
-        FunctionItem: 'fns',
-        StaticItem: 'statics',
-        ImplItem: 'impls',
-        ViewItemItem: 'viewitems',
-    };
+    var delayedIndexations = [],
+        types = {
+            ModuleItem: 'mods',
+            StructItem: 'structs',
+            EnumItem: 'enums',
+            TraitItem: 'traits',
+            TypedefItem: 'typedefs',
+            FunctionItem: 'fns',
+            StaticItem: 'statics',
+            ImplItem: 'impls',
+            ViewItemItem: 'viewitems',
+        };
 
     function indexTyparams(typarams) {
         typarams.forEach(function (typaram) {
@@ -575,7 +581,7 @@ function indexModule(path, module, typeTree, references, searchIndex) {
         methods.forEach(function (method) {
             var generics;
 
-            method = method.fields[0];
+            method = method.fields ? method.fields[0] : method;
             generics = getGenerics(method);
             if (generics && generics.type_params) {
                 indexTyparams(generics.type_params);
@@ -584,27 +590,68 @@ function indexModule(path, module, typeTree, references, searchIndex) {
         });
     }
 
-    // TODO index impls methods?
-
     function indexVariants(variants, parentName, parentType) {
         variants.forEach(function (variant) {
             searchIndex.push({type: 'variant', name: variant.name, parent: parentName, parentType: parentType, desc: '', path: getPath(typeTree).join('::')});
         });
     }
 
+    function indexImpl(def) {
+        var generics, forId, ofId;
+
+        if (def.inner.fields[0].for_.variant === 'ResolvedPath') {
+            forId = def.inner.fields[0].for_.fields[2];
+        }
+
+        // TODO this is the id of the particular impl, not of the trait, perhaps, perhaps not
+        ofId = def.inner.fields[0].trait_ ? def.inner.fields[0].trait_.id : null;
+
+        generics = getGenerics(def);
+        if (generics && generics.type_params) {
+            indexTyparams(generics.type_params);
+        }
+
+        if (ofId) {
+            if (typeTree.implsfor[forId] === undefined) {
+                typeTree.implsfor[forId] = [];
+            }
+            if (typeTree.implsof[ofId] === undefined) {
+                typeTree.implsof[ofId] = [];
+            }
+            typeTree.implsfor[forId].push(def);
+            typeTree.implsof[ofId].push(def);
+        } else if (forId) {
+            if (typeTree.impls[forId] === undefined) {
+                typeTree.impls[forId] = [];
+            }
+            typeTree.impls[forId].push(def);
+        } else {
+            throw new Error('Impls should be for something or of something for a generic type ' + JSON.stringify(def));
+        }
+
+        if (forId) {
+            delayedIndexations.push(function () {
+                indexMethods(def.inner.fields[0].methods, references[forId].def.name, 'impl');
+            });
+        }
+    }
+
     function indexItem(type, def) {
         var name = def.name, generics;
+
+        if (type === 'impls') {
+            indexImpl(def);
+            return;
+        }
+
         if (type === 'mods') {
             def.id = path + name;
             typeTree.submods[name] = createTypeTreeNode(name, typeTree);
-            indexModule(path + '::' + name, def, typeTree.submods[name], references, searchIndex);
+            delayedIndexations = delayedIndexations.concat(indexModule(path + '::' + name, def, typeTree.submods[name], references, searchIndex));
         } else if (type === 'statics') {
             def.id = path + '::' + name;
         } else if (type === 'viewitems') {
             // TODO scan re-exports?
-            return;
-        } else if (type === 'impls') {
-            // TODO build cross-link of implemented stuff and traits implemented
             return;
         } else if (def.id === undefined) {
             throw new Error('Missing id on type ' + type + ' content: ' + JSON.stringify(def));
@@ -639,6 +686,8 @@ function indexModule(path, module, typeTree, references, searchIndex) {
             indexItem(types[item.inner.variant], item);
         });
     });
+
+    return delayedIndexations;
 }
 
 function dumpModule(path, module, typeTree, references, crate, crates, version, versions) {
@@ -765,7 +814,10 @@ function initCrate(crate, searchIndex) {
         }
     }
 
-    indexModule(crate.name, crate.data, crate.typeTree, crate.references, searchIndex);
+    delayedIndexations = indexModule(crate.name, crate.data, crate.typeTree, crate.references, searchIndex);
+    delayedIndexations.forEach(function (cb) {
+        cb();
+    });
 }
 
 function dumpCrate(crate, crates, version, versions) {
