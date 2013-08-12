@@ -529,7 +529,7 @@ function render(template, vars, references, version, cb) {
             }
             return references[type.fields[0]].def.name;
         case 'Unit':
-            return '';
+            return '()';
         case 'BareFunction':
             return (type.fields[0].abi ? 'extern ' + type.fields[0].abi + ' ' : '') + vars.render_fn(type.fields[0], currentTree, 'BareFunction');
         }
