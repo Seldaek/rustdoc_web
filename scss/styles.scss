@@ -84,6 +84,20 @@
     }
 
     .docblock {
+        &.short {
+            &.nowrap {
+                display: block;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+            p {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                margin: 0;
+            }
+        }
+
         h1 {
             font-size: 1.2em;
         }

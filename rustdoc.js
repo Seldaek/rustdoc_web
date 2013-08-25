@@ -804,7 +804,6 @@ function indexModule(path, module, typeTree, references, searchIndex) {
         }
 
         if (type === 'reexports') {
-            // using the array length as a unique id of sorts since reexports have no id
             typeTree[type][uid] = def;
             uid += 1;
             return;
@@ -1049,6 +1048,4 @@ function dumpCrate(crate, crates, version, versions) {
         renderCratesIndex(version, versions);
     });
     renderVersionsIndex(versions);
-
-    // TODO generate mod/elem.html files that redir to mod/type.elem.html (or show a "did you mean?" list of elems if a few of diff types have the same name)
 }());

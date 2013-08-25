@@ -30,11 +30,15 @@
                     {% endfor %}
                 </table>
             {% else %}
-                <ul class="item-list{% if count(elems) > 25 %} multi-column{% endif %}">
+                <table>
                     {% for item in sort(elems) %}
-                        <li>{{ link_to_element(item.id, type_tree) }}</li>
+                        {% set elem = element_by_id(item.id) %}
+                        <tr>
+                            <td>{{ link_to_element(item.id, type_tree) }}</td>
+                            <td class="docblock short">{{ short_description(elem.def) }}</td>
+                        </tr>
                     {% endfor %}
-                </ul>
+                </table>
             {% endif %}
         {% endif %}
     {% endfor %}

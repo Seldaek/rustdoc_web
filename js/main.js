@@ -12,9 +12,23 @@
 
 (function () {
     "use strict";
-    var interval, searchEngine = new fullproof.ScoringEngine([new fullproof.StoreDescriptor("memorystore", fullproof.store.MemoryStore)]);
+    var resizeTimeout, interval, searchEngine = new fullproof.ScoringEngine([new fullproof.StoreDescriptor("memorystore", fullproof.store.MemoryStore)]);
 
     $('.js-only').removeClass('js-only');
+
+    function resizeShortBlocks() {
+        if (resizeTimeout) {
+            clearTimeout(resizeTimeout);
+        }
+        resizeTimeout = setTimeout(function () {
+            var contentWidth = $('.content').width();
+            $('.docblock.short').width(function () {
+                return contentWidth - 40 - $(this).prev().width();
+            }).addClass('nowrap');
+        }, 150);
+    }
+    resizeShortBlocks();
+    $(window).on('resize', resizeShortBlocks);
 
     $(document).on('keyup', function (e) {
         if (document.activeElement.tagName === 'INPUT') {
