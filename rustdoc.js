@@ -574,6 +574,10 @@ function render(template, vars, references, version, cb) {
     vars.render_fn = function (fn, currentTree, fnType) {
         var output = '', decl = getDecl(fn), temp;
 
+        if (fn.inner && fn.inner.fields && fn.inner.fields[0].purity === 'unsafe_fn') {
+            output += 'unsafe ';
+        }
+
         if (fnType === 'Closure') {
             if (fn.sigil) {
                 if (fn.sigil === 'BorrowedSigil') {
