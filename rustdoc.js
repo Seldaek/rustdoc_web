@@ -362,10 +362,14 @@ function render(template, vars, references, version, cb) {
 
         return pubTraits;
     };
-    vars.filter_docable = function (elems) {
+    vars.filter_docable = function (elems, type) {
         var key, filtered = {};
         for (key in elems) {
-            if (extractDocs(references[key].def, true, true) !== false) {
+            if (type === 'reexports') {
+                if (elems[key].visibility === 'public') {
+                    filtered[key] = elems[key];
+                }
+            } else if (extractDocs(references[key].def, true, true) !== false) {
                 filtered[key] = elems[key];
             }
         }
@@ -515,11 +519,9 @@ function render(template, vars, references, version, cb) {
         case 'SimpleImport':
             return type.fields[1].name;
         case 'GlobImport':
-            return type.fields[0].name;
+            return type.fields[0].name + '::*';
         case 'ImportList':
             return type.fields[0].name + '::{' + type.fields[1].join(', ') + '}';
-        case 'ExternMod':
-            return type.fields[0];
         case 'String':
             return 'str';
         case 'Bool':

@@ -5,10 +5,11 @@
 {% endblock %}
 
 {% block definition %}
-    {% if type_tree.reexports is not empty %}
+    {% set reexports = filter_docable(type_tree.reexports, 'reexports') %}
+    {% if reexports is not empty %}
         <h2>{{ 'reexports'|trans }}</h2>
         <ul class="item-list">
-            {% for item in type_tree.reexports %}
+            {% for item in reexports %}
                 <li><code>{{ short_type(item.inner, type_tree) }}</code></li>
             {% endfor %}
         </ul>
