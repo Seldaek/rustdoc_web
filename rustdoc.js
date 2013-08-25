@@ -506,6 +506,20 @@ function render(template, vars, references, version, cb) {
             }).join(', ');
             return '(' + types + ')';
 
+        case 'ViewItemItem':
+            return 'pub use ' + shortType(type.fields[0].inner, currentTree, realType) + ';';
+        case 'Import':
+            return type.fields[0].map(function (t) {
+                return shortType(t, currentTree, realType);
+            }).join(', ');
+        case 'SimpleImport':
+            return type.fields[1].name;
+        case 'GlobImport':
+            return type.fields[0].name;
+        case 'ImportList':
+            return type.fields[0].name + '::{' + type.fields[1].join(', ') + '}';
+        case 'ExternMod':
+            return type.fields[0];
         case 'String':
             return 'str';
         case 'Bool':
@@ -685,7 +699,8 @@ function render(template, vars, references, version, cb) {
 }
 
 function indexModule(path, module, typeTree, references, searchIndex) {
-    var delayedIndexations = [],
+    var uid = 1,
+        delayedIndexations = [],
         types = {
             ModuleItem: 'mods',
             StructItem: 'structs',
@@ -695,7 +710,7 @@ function indexModule(path, module, typeTree, references, searchIndex) {
             FunctionItem: 'fns',
             StaticItem: 'statics',
             ImplItem: 'impls',
-            ViewItemItem: 'viewitems',
+            ViewItemItem: 'reexports',
         };
 
     function indexTyparams(typarams) {
@@ -778,20 +793,22 @@ function indexModule(path, module, typeTree, references, searchIndex) {
             return;
         }
 
+        if (type === 'reexports') {
+            // using the array length as a unique id of sorts since reexports have no id
+            typeTree[type][uid] = def;
+            uid += 1;
+            return;
+        }
         if (type === 'mods') {
             def.id = path + name;
             typeTree.submods[name] = createTypeTreeNode(name, typeTree);
             delayedIndexations = delayedIndexations.concat(indexModule(path + '::' + name, def, typeTree.submods[name], references, searchIndex));
         } else if (type === 'statics') {
             def.id = path + '::' + name;
-        } else if (type === 'viewitems') {
-            // TODO scan re-exports?
-            return;
         } else if (def.id === undefined) {
             throw new Error('Missing id on type ' + type + ' content: ' + JSON.stringify(def));
         }
 
-        // FIXME all the ifs
         generics = getGenerics(def);
         if (generics && generics.type_params) {
             indexTyparams(generics.type_params);
