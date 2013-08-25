@@ -790,7 +790,7 @@ function indexModule(path, module, typeTree, references, searchIndex) {
 
         if (forId) {
             delayedIndexations.push(function () {
-                indexMethods(def.inner.fields[0].methods, references[forId].def.name, 'struct');
+                indexMethods(def.inner.fields[0].methods, references[forId].def.name, shortenType(references[forId].type));
             });
         }
     }
