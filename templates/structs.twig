@@ -8,7 +8,7 @@
 
 {% if struct_type == 'Plain' %}
 <pre class="{{ type }}">
-struct {{ element.name }}{{ render_generics(element, type_tree) }} {
+{% if element.visibility == 'private' %}priv {% endif %}struct {{ element.name }}{{ render_generics(element, type_tree) }} {
 {% for field in fields %}
     {% if field.visibility == "private" %}priv {% endif %}{{ field.name }}: {{ short_type(field.inner.fields[0].type_, type_tree) }}{% if not loop.last %},{% endif %}
 
@@ -16,9 +16,9 @@ struct {{ element.name }}{{ render_generics(element, type_tree) }} {
 }
 </pre>
 {% elseif struct_type == 'Tuple' or struct_type == 'Newtype' %}
-    <pre class="{{ type }}">struct {{ element.name }}{{ render_generics(element, type_tree) }}({% for field in fields %}{{ short_type(field.inner.fields[0].type_, type_tree) }}{% if not loop.last %}, {% endif %}{% endfor %});</pre>
+    <pre class="{{ type }}">{% if element.visibility == 'private' %}priv {% endif %}struct {{ element.name }}{{ render_generics(element, type_tree) }}({% for field in fields %}{{ short_type(field.inner.fields[0].type_, type_tree) }}{% if not loop.last %}, {% endif %}{% endfor %});</pre>
 {% elseif struct_type == 'Unit' %}
-    <pre class="{{ type }}">struct {{ element.name }}{{ render_generics(element, type_tree) }};</pre>
+    <pre class="{{ type }}">{% if element.visibility == 'private' %}priv {% endif %}struct {{ element.name }}{{ render_generics(element, type_tree) }};</pre>
 {% else %}
     <pre class="{{ type }}">Unkwown struct type: {{ struct_type }}</pre>
 {% endif %}
@@ -26,7 +26,7 @@ struct {{ element.name }}{{ render_generics(element, type_tree) }} {
 {% endblock %}
 
 {% block extra %}
-    {% set all_impls = {impls: type_tree.impls[element.id], trait_impls: type_tree.implsfor[element.id]} %}
+    {% set all_impls = {impls: type_tree.impls[element.id], trait_impls: filter_priv_traits(type_tree.implsfor[element.id])} %}
 
     {% for type, impls in all_impls %}
         {% if impls is not empty %}

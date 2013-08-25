@@ -150,10 +150,13 @@ function extract(data, key) {
     return res;
 }
 
-function extractDocs(elem, skipFormatting) {
+function extractDocs(elem, skipFormatting, returnFalseIfNotDocable) {
     var docs = extract(elem.attrs, 'doc');
 
     if (docs instanceof Array && docs[0].fields[0] === 'hidden') {
+        return returnFalseIfNotDocable === true ? false : '';
+    }
+    if (returnFalseIfNotDocable === true && elem.visibility === 'hidden') {
         return false;
     }
 
@@ -277,11 +280,9 @@ function render(template, vars, references, version, cb) {
         if (!currentTree) {
             throw new Error('Missing currentTree arg #2');
         }
-        if (references[id].tree !== currentTree) {
-            modPrefix = modPath(references[id].tree);
-        }
+        modPrefix = modPath(references[id].tree);
 
-        return '<a class="' + shortenType(references[id].type) + '" href="' + vars.url_to_element(id, currentTree) + '">' + modPrefix + references[id].def.name + '</a>';
+        return '<a class="' + shortenType(references[id].type) + '" href="' + vars.url_to_element(id, currentTree) + '" title="' + modPrefix + references[id].def.name + '">' + references[id].def.name + '</a>';
     };
     vars.link_to_external = function (name, type, knownCrates, version) {
         var crate, path, match, url, localCrate;
@@ -347,10 +348,24 @@ function render(template, vars, references, version, cb) {
 
         return out + '::';
     };
+    vars.filter_priv_traits = function (traits) {
+        var pubTraits = [];
+        if (traits === null || traits === undefined) {
+            return traits;
+        }
+
+        traits.forEach(function (trait) {
+            if (trait.visibility !== 'private') {
+                pubTraits.push(trait);
+            }
+        });
+
+        return pubTraits;
+    };
     vars.filter_docable = function (elems) {
         var key, filtered = {};
         for (key in elems) {
-            if (extractDocs(references[key].def) !== false) {
+            if (extractDocs(references[key].def, true, true) !== false) {
                 filtered[key] = elems[key];
             }
         }

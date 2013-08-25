@@ -2,5 +2,5 @@
 
 {% block definition %}
     <h2>Definition</h2>
-    <pre class="{{ type }}">{{ render_fn(element, type_tree, 'fn') }}</pre>
+    <pre class="{{ type }}">{% if element.visibility == 'private' %}priv {% endif %}{{ render_fn(element, type_tree, 'fn') }}</pre>
 {% endblock %}
