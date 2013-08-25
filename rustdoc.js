@@ -517,7 +517,11 @@ function render(template, vars, references, version, cb) {
                 return shortType(t, currentTree, realType);
             }).join(', ');
         case 'SimpleImport':
-            return type.fields[1].name;
+            if (type.fields[0] === type.fields[1].name || type.fields[1].name.substring(type.fields[1].name.length - type.fields[0].length - 2) === '::' + type.fields[0]) {
+                return type.fields[1].name;
+            }
+
+            return type.fields[0] + ' = ' + type.fields[1].name;
         case 'GlobImport':
             return type.fields[0].name + '::*';
         case 'ImportList':
