@@ -700,6 +700,9 @@ function render(template, vars, references, version, cb) {
         if (!element.source) {
             throw new Error('Element has no source: ' + JSON.stringify(element));
         }
+        if (element.source.match(/^<std-macros>:/)) {
+            return '';
+        }
         matches = element.source.match(/^([a-z0-9_.\/\-]+):(\d+):\d+:? (\d+):\d+$/i);
         if (!matches) {
             throw new Error('Could not parse element.source for ' + JSON.stringify(element));
