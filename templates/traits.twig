@@ -15,7 +15,7 @@
 
 {% endif %}
 {% for method in provided_methods %}
-    {{ render_fn(method, type_tree, "TraitFunction") }} { <a title="View sources" href="{{ source_url(method, crate) }}">...</a> }
+    {{ render_fn(method, type_tree, "TraitFunction") }} { {% set src_url = source_url(method, crate) %}{% if src_url is not empty %}<a title="View sources" href="{{ src_url }}">...</a>{% else %}...{% endif %} }
 {% endfor %}
 }
 </pre>

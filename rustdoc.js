@@ -209,7 +209,7 @@ function getGenerics(element) {
 }
 
 function primitiveType(type) {
-    var foundType = type.fields[0].substring(3),
+    var foundType = typeof type === 'string' ? type.substring(3) : type.fields[0].substring(3),
         typeAliases = {
             u: 'uint',
             f: 'float',
@@ -479,7 +479,7 @@ function render(template, vars, references, version, cb) {
         return count;
     };
     vars.short_type = function shortType(type, currentTree, realType, pureLink) {
-        var types;
+        var types, path;
 
         if (!currentTree) {
             throw new Error('Missing currentTree arg #2');
@@ -517,11 +517,14 @@ function render(template, vars, references, version, cb) {
                 return shortType(t, currentTree, realType);
             }).join(', ');
         case 'SimpleImport':
-            if (type.fields[0] === type.fields[1].name || type.fields[1].name.substring(type.fields[1].name.length - type.fields[0].length - 2) === '::' + type.fields[0]) {
-                return type.fields[1].name;
+            path = type.fields[1].segments.map(function (s) {
+                return s.name;
+            }).join('::');
+            if (type.fields[0] === path || path.substring(path.length - type.fields[0].length - 2) === '::' + type.fields[0]) {
+                return path;
             }
 
-            return type.fields[0] + ' = ' + type.fields[1].name;
+            return type.fields[0] + ' = ' + path;
         case 'GlobImport':
             return type.fields[0].name + '::*';
         case 'ImportList':

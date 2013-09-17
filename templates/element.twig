@@ -2,7 +2,10 @@
 
 {% block content %}
     {% block source %}
-        <a class="source" title="View sources" href="{{ source_url(element, crate) }}">[src]</a>
+        {% set src_url = source_url(element, crate) %}
+        {% if src_url is not empty %}
+            <a class="source" title="View sources" href="{{ src_url }}">[src]</a>
+        {% endif %}
     {% endblock %}
     {% block name %}
         <h1 class="fqn">{{ breadcrumb(type_tree) }}<a class="{{ type }}" href="">{{ element.name }}</a></h1>

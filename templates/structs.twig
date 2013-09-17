@@ -40,7 +40,7 @@
                 <pre class="struct">
 impl{{ render_generics(impl, type_tree) }} {% if type == 'trait_impls' %}of {{ short_type(impl.inner.fields[0].trait_, type_tree) }} for {% endif %}{{ short_type(impl.inner.fields[0].for_, type_tree) }} {
 {% for method in impl.inner.fields[0].methods %}
-    {{ render_fn(method, type_tree) }} { ... }
+    {{ render_fn(method, type_tree) }} { {% set src_url = source_url(method, crate) %}{% if src_url is not empty %}<a title="View sources" href="{{ src_url }}">...</a>{% else %}...{% endif %} }
 {% endfor %}
 }</pre>
                 <table>
