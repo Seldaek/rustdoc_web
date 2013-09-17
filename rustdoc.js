@@ -1047,11 +1047,11 @@ function dumpCrate(crate, crates, version, versions) {
         fs.writeFile(config.outputDir + version.version + '/search-index.js', "searchIndex = " + JSON.stringify(searchIndex));
         searchIndex = [];
 
+        renderCratesIndex(version, versions);
+
         version.crates.forEach(function (crate) {
             dumpCrate(crate, version.crates, version, versions);
         });
-
-        renderCratesIndex(version, versions);
     });
     renderVersionsIndex(versions);
 }());
