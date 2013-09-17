@@ -70,8 +70,116 @@
         document.location.href = url;
     });
 
-    function initSearch(data) {
-        var currentResults;
+    function initSearch(searchIndex) {
+        var currentResults, index;
+
+        // clear cached values from the search bar
+        $(".search-input")[0].value = '';
+
+        function execQuery(query, max, searchWords) {
+            var valLower = query.query.toLowerCase(),
+                val = valLower,
+                typeFilter = query.type,
+                results = [],
+                aa = 0,
+                bb = 0;
+
+            // quoted values mean literal search
+            bb = searchWords.length;
+            if ((val.charAt(0) === "\"" || val.charAt(0) === "'") && val.charAt(val.length - 1) === val.charAt(0)) {
+                val = val.substr(1, val.length - 2);
+                for (aa = 0; aa < bb; aa += 1) {
+                    if (searchWords[aa] === val) {
+                        // filter type: ... queries
+                        if (!typeFilter || typeFilter === searchIndex[aa].type) {
+                            results.push([aa, -1]);
+                        }
+                    }
+                    if (results.length === max) {
+                        break;
+                    }
+                }
+            } else {
+                // gather matching search results up to a certain maximum
+                val = val.replace(/\_/g, "");
+                for (aa = 0; aa < bb; aa += 1) {
+                    if (searchWords[aa].indexOf(val) > -1 || searchWords[aa].replace(/_/g, "").indexOf(val) > -1) {
+                        // filter type: ... queries
+                        if (!typeFilter || typeFilter === searchIndex[aa].type) {
+                            results.push([aa, searchWords[aa].replace(/_/g, "").indexOf(val)]);
+                        }
+                    }
+                    if (results.length === max) {
+                        break;
+                    }
+                }
+            }
+            bb = results.length;
+            for (aa = 0; aa < bb; aa += 1) {
+                results[aa].push(searchIndex[results[aa][0]].type);
+            }
+            for (aa = 0; aa < bb; aa += 1) {
+                results[aa].push(searchIndex[results[aa][0]].path);
+            }
+
+            // if there are no results then return to default and fail
+            if (results.length === 0) {
+                return [];
+            }
+
+            // sort by exact match
+            results.sort(function search_complete_sort0(aaa, bbb) {
+                if (searchWords[aaa[0]] === valLower && searchWords[bbb[0]] !== valLower) {
+                    return 1;
+                }
+            });
+            // first sorting attempt
+            // sort by item name length
+            results.sort(function search_complete_sort1(aaa, bbb) {
+                if (searchWords[aaa[0]].length > searchWords[bbb[0]].length) {
+                    return 1;
+                }
+            });
+            // second sorting attempt
+            // sort by item name
+            results.sort(function search_complete_sort1(aaa, bbb) {
+                if (searchWords[aaa[0]].length === searchWords[bbb[0]].length && searchWords[aaa[0]] > searchWords[bbb[0]]) {
+                    return 1;
+                }
+            });
+            // third sorting attempt
+            // sort by index of keyword in item name
+            if (results[0][1] !== -1) {
+                results.sort(function search_complete_sort1(aaa, bbb) {
+                    if (aaa[1] > bbb[1] && bbb[1] === 0) {
+                        return 1;
+                    }
+                });
+            }
+            // fourth sorting attempt
+            // sort by type
+            results.sort(function search_complete_sort3(aaa, bbb) {
+                if (searchWords[aaa[0]] === searchWords[bbb[0]] && aaa[2] > bbb[2]) {
+                    return 1;
+                }
+            });
+            // fifth sorting attempt
+            // sort by path
+            results.sort(function search_complete_sort4(aaa, bbb) {
+                if (searchWords[aaa[0]] === searchWords[bbb[0]] && aaa[2] === bbb[2] && aaa[3] > bbb[3]) {
+                    return 1;
+                }
+            });
+            // sixth sorting attempt
+            // remove duplicates, according to the data provided
+            for (aa = results.length - 1; aa > 0; aa -= 1) {
+                if (searchWords[results[aa][0]] === searchWords[results[aa - 1][0]] && results[aa][2] === results[aa - 1][2] && results[aa][3] === results[aa - 1][3]) {
+                    results[aa][0] = -1;
+                }
+            }
+
+            return results;
+        }
 
         function getQuery() {
             var matches, type, query = $('.search-input').val();
@@ -132,46 +240,26 @@
             });
         }
 
-        function showResults(resultSet) {
+        function showResults(results) {
             var output, shown, query = getQuery();
 
             currentResults = query.id;
             output = '<h1>Results for ' + query.query + (query.type ? ' (type: ' + query.type + ')' : '') + '</h1>';
             output += '<table class="search-results">';
 
-            if (resultSet) {
-                resultSet.setComparatorObject({
-                    lower_than: function (a, b) {
-                        return a.score > b.score;
-                    },
-                    equals: function (a, b) {
-                        return a.score === b.score;
-                    }
-                });
-            }
-
-            if (resultSet.getSize() > 0) {
+            if (results.length > 0) {
                 shown = [];
 
-                resultSet.forEach(function (entry) {
-                    var item, name, type;
+                results.forEach(function (item) {
+                    var name, type;
 
-                    if (entry instanceof fullproof.ScoredElement) {
-                        entry = entry.value;
-                    }
-                    if (shown.indexOf(entry) !== -1 || shown.length >= 100) {
+                    if (shown.indexOf(item) !== -1) {
                         return;
                     }
 
-                    shown.push(entry);
-                    item = data[entry];
+                    shown.push(item);
                     name = item.name;
                     type = item.type;
-
-                    // filter type: ... queries
-                    if (query.type && query.type !== type) {
-                        return;
-                    }
 
                     output += '<tr class="' + type + ' result"><td>';
 
@@ -198,7 +286,12 @@
         }
 
         function search(e) {
-            var query = getQuery();
+            var query, filterdata = [], obj, i, len,
+                results = [],
+                maxResults = 200,
+                resultIndex;
+
+            query = getQuery();
             if (e) {
                 e.preventDefault();
             }
@@ -206,10 +299,109 @@
             if (!query.query || query.id === currentResults) {
                 return;
             }
-            searchEngine.lookup(query.query, showResults);
+
+            resultIndex = execQuery(query, 20000, index);
+            len = resultIndex.length;
+            for (i = 0; i < len; i += 1) {
+                if (resultIndex[i][0] > -1) {
+                    obj = searchIndex[resultIndex[i][0]];
+                    filterdata.push([obj.name, obj.type, obj.path, obj.desc]);
+                    results.push(obj);
+                }
+                if (results.length >= maxResults) {
+                    break;
+                }
+            }
+
+            // TODO add sorting capability through this function?
+            //
+            //            // the handler for the table heading filtering
+            //            filterdraw = function search_complete_filterdraw(node) {
+            //                var name = "",
+            //                    arrow = "",
+            //                    op = 0,
+            //                    tbody = node.parentNode.parentNode.nextSibling,
+            //                    anchora = {},
+            //                    tra = {},
+            //                    tha = {},
+            //                    td1a = {},
+            //                    td2a = {},
+            //                    td3a = {},
+            //                    aaa = 0,
+            //                    bbb = 0;
+            //
+            //                // the 4 following conditions set the rules for each
+            //                // table heading
+            //                if (node === ths[0]) {
+            //                    op = 0;
+            //                    name = "name";
+            //                    ths[1].innerHTML = ths[1].innerHTML.split(" ")[0];
+            //                    ths[2].innerHTML = ths[2].innerHTML.split(" ")[0];
+            //                    ths[3].innerHTML = ths[3].innerHTML.split(" ")[0];
+            //                }
+            //                if (node === ths[1]) {
+            //                    op = 1;
+            //                    name = "type";
+            //                    ths[0].innerHTML = ths[0].innerHTML.split(" ")[0];
+            //                    ths[2].innerHTML = ths[2].innerHTML.split(" ")[0];
+            //                    ths[3].innerHTML = ths[3].innerHTML.split(" ")[0];
+            //                }
+            //                if (node === ths[2]) {
+            //                    op = 2;
+            //                    name = "path";
+            //                    ths[0].innerHTML = ths[0].innerHTML.split(" ")[0];
+            //                    ths[1].innerHTML = ths[1].innerHTML.split(" ")[0];
+            //                    ths[3].innerHTML = ths[3].innerHTML.split(" ")[0];
+            //                }
+            //                if (node === ths[3]) {
+            //                    op = 3;
+            //                    name = "description";
+            //                    ths[0].innerHTML = ths[0].innerHTML.split(" ")[0];
+            //                    ths[1].innerHTML = ths[1].innerHTML.split(" ")[0];
+            //                    ths[2].innerHTML = ths[2].innerHTML.split(" ")[0];
+            //                }
+            //
+            //                // ascending or descending search
+            //                arrow = node.innerHTML.split(" ")[1];
+            //                if (arrow === undefined || arrow === "\u25b2") {
+            //                    arrow = "\u25bc";
+            //                } else {
+            //                    arrow = "\u25b2";
+            //                }
+            //
+            //                // filter the data
+            //                filterdata.sort(function search_complete_filterDraw_sort(xx, yy) {
+            //                    if ((arrow === "\u25b2" && xx[op].toLowerCase() < yy[op].toLowerCase()) || (arrow === "\u25bc" && xx[op].toLowerCase() > yy[op].toLowerCase())) {
+            //                        return 1;
+            //                    }
+            //                });
+            //            };
+
+            showResults(results);
         }
 
-        function engineReady() {
+        function buildIndex(searchIndex) {
+            var len = searchIndex.length,
+                i = 0,
+                searchWords = [];
+
+            // before any analysis is performed lets gather the search terms to
+            // search against apart from the rest of the data.  This is a quick
+            // operation that is cached for the life of the page state so that
+            // all other search operations have access to this cached data for
+            // faster analysis operations
+            for (i = 0; i < len; i += 1) {
+                if (typeof searchIndex[i].name === "string") {
+                    searchWords.push(searchIndex[i].name.toLowerCase());
+                } else {
+                    searchWords.push("");
+                }
+            }
+
+            return searchWords;
+        }
+
+        function startSearch() {
             var keyUpTimeout;
             $('.do-search').on('click', search);
             $('.search-input').on('keyup', function () {
@@ -218,35 +410,8 @@
             });
         }
 
-        (function () {
-            function populateIndexNew(injector, callback) {
-                var i, text,
-                    len = data.length,
-                    syncCb = fullproof.make_synchro_point(callback, len);
-
-                for (i = 0; i < len; i += 1) {
-                    text = data[i].path + (data[i].type === 'mods' ? '' : "::" + data[i].name) + " " + data[i].desc;
-                    injector.inject(text, i, syncCb);
-                }
-            }
-
-            var indices = [
-                new fullproof.IndexUnit(
-                    "basicindex",
-                    new fullproof.Capabilities().setStoreObjects(false).setUseScores(true).setDbName('dummy').setComparatorObject(fullproof.ScoredEntry.comparatorObject),
-                    new fullproof.ScoringAnalyzer(fullproof.normalizer.to_lowercase_nomark, fullproof.normalizer.remove_duplicate_letters),
-                    populateIndexNew
-                ),
-                new fullproof.IndexUnit(
-                    "stemmedindex",
-                    new fullproof.Capabilities().setStoreObjects(false).setUseScores(true).setDbName('dummy').setComparatorObject(fullproof.ScoredEntry.comparatorObject),
-                    new fullproof.ScoringAnalyzer(fullproof.normalizer.to_lowercase_nomark, fullproof.english.metaphone),
-                    populateIndexNew
-                )
-            ];
-
-            searchEngine.open(indices, fullproof.make_callback(engineReady, true), fullproof.make_callback(engineReady, false));
-        }());
+        index = buildIndex(searchIndex);
+        startSearch();
     }
 
     interval = setInterval(function () {
