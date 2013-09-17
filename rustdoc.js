@@ -526,9 +526,9 @@ function render(template, vars, references, version, cb) {
 
             return type.fields[0] + ' = ' + path;
         case 'GlobImport':
-            return type.fields[0].name + '::*';
+            return type.fields[0].segments.map(function (s) { return s.name; }).join('::') + '::*';
         case 'ImportList':
-            return type.fields[0].name + '::{' + type.fields[1].join(', ') + '}';
+            return type.fields[0].segments.map(function (s) { return s.name; }).join('::') + '::{' + type.fields[1].join(', ') + '}';
         case 'String':
             return 'str';
         case 'Bool':
