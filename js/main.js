@@ -1,5 +1,5 @@
 /*jslint browser: true, es5: true */
-/*globals $: true, searchIndex: true, fullproof: true, rootPath: true */
+/*globals $: true, searchIndex: true, rootPath: true */
 
 /*
  * This file is part of the rustdoc_web package.
@@ -12,7 +12,7 @@
 
 (function () {
     "use strict";
-    var resizeTimeout, interval, searchEngine = new fullproof.ScoringEngine([new fullproof.StoreDescriptor("memorystore", fullproof.store.MemoryStore)]);
+    var resizeTimeout, interval;
 
     $('.js-only').removeClass('js-only');
 

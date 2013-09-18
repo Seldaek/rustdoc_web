@@ -1009,7 +1009,7 @@ function dumpCrate(crate, crates, version, versions) {
         versions.push({
             version: version,
             crates: crates,
-            prerelease: !!require('semver').valid(version),
+            prerelease: null === require('semver').valid(version),
         });
 
         if (!fs.existsSync(config.outputDir + version)) {
