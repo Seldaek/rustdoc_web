@@ -208,6 +208,72 @@ function getGenerics(element) {
     return element.inner.fields[0].generics;
 }
 
+function extractId(inner, element) {
+    var ids = [];
+
+    switch (inner) {
+    case 'Unit':
+    case 'Bool':
+        return 'std::' + inner.toLowerCase();
+    case 'String':
+        return 'std::str';
+    }
+
+    switch (inner.variant) {
+    case 'ResolvedPath':
+        return inner.fields[2];
+    case 'BorrowedRef':
+        return extractId(inner.fields[2], element);
+    case 'Unique':
+        return extractId(inner.fields[0], element);
+    case 'Vector':
+        return 'std::vec';
+    case 'RawPointer':
+        return extractId(inner.fields[1], element);
+    case 'Managed':
+        return extractId(inner.fields[1], element);
+    case 'Primitive':
+        if (typeof inner.fields[0] === 'string') {
+            return 'std::' + inner.fields[0].replace('ty_', '');
+        }
+        return 'std::' + inner.fields[0].variant.replace('ty_', '');
+    case 'Tuple':
+        return inner.fields[0].map(function (item) {
+            return extractId(item, element);
+        });
+    case 'Generic':
+        element.generics.type_params.forEach(function (param) {
+            var bounds, id;
+            if (param.id === inner.fields[0]) {
+                bounds = param.bounds.filter(function (bound) {
+                    return typeof bound !== 'string';
+                });
+                if (bounds.length === 0) {
+                    return;
+                }
+                id = false;
+                bounds.forEach(function (bound) {
+                    if (bound.variant === 'TraitBound' && bound.fields[0].variant === 'ResolvedPath') {
+                        id = bound.fields[0].fields[2];
+                    } else if (bound.variant === 'TraitBound' && bound.fields[0].variant === 'External') {
+                        id = bound.fields[0].fields[1] + ' ' + bound.fields[0].fields[0];
+                    }
+                });
+                if (!id) {
+                    throw new Error('Impl is for a Generic variant but the id could not be resolved in: ' + JSON.stringify(inner) + ' ' + JSON.stringify(element));
+                }
+                ids.push(id);
+            }
+        });
+
+        return ids;
+    case 'External':
+        return inner.fields[1] + ' ' + inner.fields[0];
+    default:
+        throw new Error('Unknown variant: ' + inner.variant + ' in ' + JSON.stringify(inner));
+    }
+}
+
 function primitiveType(type) {
     var foundType = typeof type === 'string' ? type.substring(3) : type.fields[0].substring(3),
         typeAliases = {
@@ -596,7 +662,7 @@ function render(template, vars, references, version, cb) {
             }
         }
 
-        output += 'fn' + (fn.name ? ' ' + fn.name : '') + vars.render_generics(fn, currentTree, fnType) + '(\n    ';
+        output += 'fn' + (fn.name ? ' <strong class="fnname">' + fn.name + '</strong>' : '') + vars.render_generics(fn, currentTree, fnType) + '(\n    ';
         if (fn.inner && fn.inner.fields && fn.inner.fields[0].self_) {
             temp = vars.short_type(fn.inner.fields[0].self_, currentTree);
             if (temp) {
@@ -622,6 +688,12 @@ function render(template, vars, references, version, cb) {
         });
 
         return output;
+    };
+    vars.collect_impls = function (element, currentTree) {
+        return {
+            impls: currentTree.impls[element.id],
+            trait_impls: vars.filter_priv_traits(currentTree.implsfor[element.id])
+        };
     };
     vars.render_generics = function renderGenerics(element, currentTree, type) {
         var type_params, lifetimes, output = '', generics;
@@ -759,16 +831,16 @@ function indexModule(path, module, typeTree, references, searchIndex) {
     function indexImpl(def) {
         var generics, forId = null, ofId = null;
 
-        if (def.inner.fields[0].for_.variant === 'ResolvedPath') {
-            forId = def.inner.fields[0].for_.fields[2];
+        // TODO fix this and find a way to list fn impls on the module page maybe?
+        if (['Closure', 'BareFunction'].indexOf(def.inner.fields[0].for_.variant) !== -1) {
+            return;
         }
 
+        forId = extractId(def.inner.fields[0].for_, def.inner.fields[0]);
+
         if (def.inner.fields[0].trait_) {
-            if (def.inner.fields[0].trait_.variant === 'ResolvedPath') {
-                ofId = def.inner.fields[0].trait_.fields[2];
-            } else if (def.inner.fields[0].trait_.variant === 'External') {
-                ofId = 'trait ' + def.inner.fields[0].trait_.fields[0];
-            } else {
+            ofId = extractId(def.inner.fields[0].trait_, def.inner.fields[0]);
+            if (!ofId) {
                 throw new Error('Unknown trait definition: ' + JSON.stringify(def));
             }
         }
@@ -778,29 +850,50 @@ function indexModule(path, module, typeTree, references, searchIndex) {
             indexTyparams(generics.type_params);
         }
 
-        if (ofId) {
-            if (typeTree.implsfor[forId] === undefined) {
-                typeTree.implsfor[forId] = [];
-            }
-            if (typeTree.implsof[ofId] === undefined) {
-                typeTree.implsof[ofId] = [];
-            }
-            typeTree.implsfor[forId].push(def);
-            typeTree.implsof[ofId].push(def);
-        } else if (forId) {
-            if (typeTree.impls[forId] === undefined) {
-                typeTree.impls[forId] = [];
-            }
-            typeTree.impls[forId].push(def);
-        } else {
-            throw new Error('Impls should be for something or of something for a generic type ' + JSON.stringify(def));
+        if (!forId) {
+            throw new Error('An impl must be for a struct|enum|fn|trait, no forId found in: ' + JSON.stringify(def));
         }
 
-        if (forId) {
-            delayedIndexations.push(function () {
-                indexMethods(def.inner.fields[0].methods, references[forId].def.name, shortenType(references[forId].type));
+        forId = forId instanceof Array ? forId : [forId];
+
+        // TODO support entries that are for nothing (e.g. impl<T> Clone for *T) and list them on the mod page
+        if (forId.length === 0) {
+            return;
+        }
+
+        if (ofId) {
+            ofId = ofId instanceof Array ? ofId : [ofId];
+
+            forId.forEach(function (id) {
+                if (typeTree.implsfor[id] === undefined) {
+                    typeTree.implsfor[id] = [];
+                }
+                typeTree.implsfor[id].push(def);
+            });
+            ofId.forEach(function (id) {
+                if (typeTree.implsof[id] === undefined) {
+                    typeTree.implsof[id] = [];
+                }
+                typeTree.implsof[id].push(def);
+            });
+        } else {
+            forId.forEach(function (id) {
+                if (typeTree.impls[id] === undefined) {
+                    typeTree.impls[id] = [];
+                }
+                typeTree.impls[id].push(def);
             });
         }
+
+        forId.forEach(function (id) {
+            delayedIndexations.push(function () {
+                if (references[id] === undefined) {
+                    indexMethods(def.inner.fields[0].methods, id, 'primitive');
+                } else {
+                    indexMethods(def.inner.fields[0].methods, references[id].def.name, shortenType(references[id].type));
+                }
+            });
+        });
     }
 
     function indexItem(type, def) {
@@ -817,7 +910,9 @@ function indexModule(path, module, typeTree, references, searchIndex) {
             return;
         }
         if (type === 'mods') {
-            def.id = path + name;
+            // this is a meaningful id: std::vec and other primitives can find their impls
+            // since extractId returns the path of the module for primitives
+            def.id = path + '::' + name;
             typeTree.submods[name] = createTypeTreeNode(name, typeTree);
             delayedIndexations = delayedIndexations.concat(indexModule(path + '::' + name, def, typeTree.submods[name], references, searchIndex));
         } else if (type === 'statics') {
@@ -1052,6 +1147,7 @@ function dumpCrate(crate, crates, version, versions) {
         renderCratesIndex(version, versions);
 
         version.crates.forEach(function (crate) {
+            console.log('Dumping ' + crate.name + ' for ' + version.version);
             dumpCrate(crate, version.crates, version, versions);
         });
     });

@@ -19,33 +19,29 @@
 {% endfor %}
 }
 </pre>
+
+    {% if required_methods is not empty %}
+        <h2 id="required-methods">Required Methods</h2>
+        {% for method in required_methods %}
+            {% set src_url = source_url(method, crate) %}{% if src_url is not empty %}<a title="View sources" class="source" href="{{ src_url }}">[src]</a>{% endif %}
+            <h3 class="method"><code>{{ render_fn(method, type_tree, "TraitFunction") }}</code></h3>
+            <div class="docblock">{{ extract_docs(method) }}</div>
+        {% endfor %}
+    {% endif %}
+
+    {% if provided_methods is not empty %}
+        <h2 id="provided-methods">Provided Methods</h2>
+        {% for method in provided_methods %}
+            {% set src_url = source_url(method, crate) %}{% if src_url is not empty %}<a title="View sources" class="source" href="{{ src_url }}">[src]</a>{% endif %}
+            <h3 class="method"><code>{{ render_fn(method, type_tree, "TraitFunction") }}</code></h3>
+            <div class="docblock">{{ extract_docs(method) }}</div>
+        {% endfor %}
+    {% endif %}
 {% endblock %}
 
 {% block extra %}
     {# TODO show inherited methods? #}
-    {% if required_methods is not empty %}
-    <h2 id="required-methods">Required Methods</h2>
-    <table>
-        {% for method in required_methods %}
-            <tr>
-                <td>{{ method.name }}</td>
-                <td class="docblock">{{ extract_docs(method) }}</td>
-            </tr>
-        {% endfor %}
-    </table>
-    {% endif %}
-
-    {% if provided_methods is not empty %}
-    <h2 id="provided-methods">Provided Methods</h2>
-    <table>
-        {% for method in provided_methods %}
-            <tr>
-                <td>{{ method.name }}</td>
-                <td class="docblock">{{ extract_docs(method) }}</td>
-            </tr>
-        {% endfor %}
-    </table>
-    {% endif %}
+    {% include 'impls.twig' %}
 
     {% set impls = unique_sorted_trait_impls(element.id, type_tree) %}
 
@@ -56,7 +52,7 @@
                 {% if impl.inner.fields[0].for_.variant == 'ResolvedPath' %}
                     <li>{{ short_type(impl.inner.fields[0].for_, type_tree, null, true) }}</li>
                 {% else %}
-                    <li><pre class="trait">impl{{ render_generics(impl, type_tree) }} of {{ short_type(impl.inner.fields[0].trait_, type_tree) }} for {{ short_type(impl.inner.fields[0].for_, type_tree) }}</pre></li>
+                    <li><code>impl{{ render_generics(impl, type_tree) }} of {{ short_type(impl.inner.fields[0].trait_, type_tree) }} for {{ short_type(impl.inner.fields[0].for_, type_tree) }}</code></li>
                 {% endif %}
             {% endfor %}
         </ul>

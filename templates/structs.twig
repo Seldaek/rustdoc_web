@@ -26,39 +26,15 @@
 {% endblock %}
 
 {% block extra %}
-    {% set all_impls = {impls: type_tree.impls[element.id], trait_impls: filter_priv_traits(type_tree.implsfor[element.id])} %}
+    <h2>Fields</h2>
+    <table>
+        {% for field in element.inner.fields[0].fields %}
+            <tr>
+                <td>{{ field.name }}</td>
+                <td class="docblock">{{ extract_docs(field) }}</td>
+            </tr>
+        {% endfor %}
+    </table>
 
-    {% for type, impls in all_impls %}
-        {% if impls is not empty %}
-            {% if type == 'trait_impls' %}
-                <h2 id="implementations">Trait Implementations</h2>
-            {% else %}
-                <h2 id="methods">Methods</h2>
-            {% endif %}
-
-            {% for impl in impls %}
-                <pre class="struct">
-impl{{ render_generics(impl, type_tree) }} {% if type == 'trait_impls' %}of {{ short_type(impl.inner.fields[0].trait_, type_tree) }} for {% endif %}{{ short_type(impl.inner.fields[0].for_, type_tree) }} {
-{% for method in impl.inner.fields[0].methods %}
-    {{ render_fn(method, type_tree) }} { {% set src_url = source_url(method, crate) %}{% if src_url is not empty %}<a title="View sources" href="{{ src_url }}">...</a>{% else %}...{% endif %} }
-{% endfor %}
-}</pre>
-                <table>
-                    {% for method in impl.inner.fields[0].methods %}
-                        {% set docs = extract_docs(method) %}
-                        {% if docs is empty %}
-                            {% set docs = extract_parent_docs(impl, method.name) %}
-                        {% endif %}
-
-                        {% if docs is not empty %}
-                            <tr>
-                                <td>{{ method.name }}</td>
-                                <td class="docblock">{{ docs }}</td>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
-                </table>
-            {% endfor %}
-        {% endif %}
-    {% endfor %}
+    {% include 'impls.twig' %}
 {% endblock %}
