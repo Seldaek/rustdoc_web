@@ -234,11 +234,6 @@ function primitiveType(type) {
 }
 
 function render(template, vars, references, version, cb) {
-    vars.settings = {
-        views: "templates/",
-        'twig options': { strict_variables: true }
-    };
-
     function relativePath(fromTree, toTree) {
         var fromPath, toPath;
 
@@ -711,7 +706,14 @@ function render(template, vars, references, version, cb) {
         return config.baseSourceUrls[crate.name].replace('%version%', crate.version) + matches[1] + '#L' + matches[2] + '-' + matches[3];
     };
 
-    Twig.renderFile("templates/" + template, vars, function (dummy, out) { cb(out); });
+    cb(
+        Twig.twig({
+            path: "templates/" + template,
+            async: false,
+            base: "templates/",
+            strict_variables: true
+        }).render(vars)
+    );
 }
 
 function indexModule(path, module, typeTree, references, searchIndex) {
@@ -893,7 +895,7 @@ function dumpModule(path, module, typeTree, references, crate, crates, version, 
             fs.mkdirSync(buildPath);
         }
         cb = function (out) {
-            fs.writeFile(buildPath + filename, out);
+            fs.writeFileSync(buildPath + filename, out);
         };
         render(type + '.twig', data, references, version, cb);
     }
