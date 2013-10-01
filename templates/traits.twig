@@ -22,20 +22,24 @@
 
     {% if required_methods is not empty %}
         <h2 id="required-methods">Required Methods</h2>
-        {% for method in required_methods %}
-            {% set src_url = source_url(method, crate) %}{% if src_url is not empty %}<a title="View sources" class="source" href="{{ src_url }}">[src]</a>{% endif %}
-            <h3 class="method"><code>{{ render_fn(method, type_tree, "TraitFunction") }}</code></h3>
-            <div class="docblock">{{ extract_docs(method) }}</div>
-        {% endfor %}
+        <div class="methods">
+            {% for method in required_methods %}
+                {% set src_url = source_url(method, crate) %}{% if src_url is not empty %}<a title="View sources" class="source" href="{{ src_url }}">[src]</a>{% endif %}
+                <h3 class="method"><code>{{ render_fn(method, type_tree, "TraitFunction") }}</code></h3>
+                <div class="docblock">{{ extract_docs(method) }}</div>
+            {% endfor %}
+        </div>
     {% endif %}
 
     {% if provided_methods is not empty %}
         <h2 id="provided-methods">Provided Methods</h2>
-        {% for method in provided_methods %}
-            {% set src_url = source_url(method, crate) %}{% if src_url is not empty %}<a title="View sources" class="source" href="{{ src_url }}">[src]</a>{% endif %}
-            <h3 class="method"><code>{{ render_fn(method, type_tree, "TraitFunction") }}</code></h3>
-            <div class="docblock">{{ extract_docs(method) }}</div>
-        {% endfor %}
+        <div class="methods">
+            {% for method in provided_methods %}
+                {% set src_url = source_url(method, crate) %}{% if src_url is not empty %}<a title="View sources" class="source" href="{{ src_url }}">[src]</a>{% endif %}
+                <h3 class="method"><code>{{ render_fn(method, type_tree, "TraitFunction") }}</code></h3>
+                <div class="docblock">{{ extract_docs(method) }}</div>
+            {% endfor %}
+        </div>
     {% endif %}
 {% endblock %}
 
