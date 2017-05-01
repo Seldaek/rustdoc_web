@@ -1141,7 +1141,7 @@ function dumpCrate(crate, crates, version, versions) {
             return a.name.localeCompare(b.name);
         });
 
-        fs.writeFile(config.outputDir + version.version + '/search-index.js', "searchIndex = " + JSON.stringify(searchIndex));
+        fs.writeFile(config.outputDir + version.version + '/search-index.js', "{searchIndex:" + JSON.stringify(searchIndex) + "}");
         searchIndex = [];
 
         renderCratesIndex(version, versions);
